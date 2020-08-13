@@ -71,6 +71,7 @@ namespace Live_Music
             musicProcessStackPanel.Visibility = Visibility.Collapsed;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+            NavigationCacheMode = NavigationCacheMode.Required;
         }
 
         private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)

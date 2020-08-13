@@ -35,6 +35,7 @@ namespace Live_Music.Views
         {
             this.InitializeComponent();
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+            NavigationCacheMode = NavigationCacheMode.Required;
         }
 
         private void ExitCompactPageMode(object sender, RoutedEventArgs e)
