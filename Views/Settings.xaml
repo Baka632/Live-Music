@@ -1,0 +1,21 @@
+﻿<Page
+    x:Class="Live_Music.FirstStartPages.Settings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Live_Music.FirstStartPages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer HorizontalAlignment="Left" VerticalAlignment="Top">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TextBlock Text="主题色" Style="{StaticResource BaseTextBlockStyle}"/>
+            <ComboBox x:Name="themeComboBox" SelectionChanged="ThemeChanged" Margin="0,5,0,0">
+                <x:String>浅色</x:String>
+                <x:String>深色</x:String>
+                <x:String>使用系统设置</x:String>
+            </ComboBox>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
