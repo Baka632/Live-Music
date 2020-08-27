@@ -275,10 +275,10 @@
         <Grid HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
             <Grid.Background>
                 <AcrylicBrush x:Name="musicNowPlayingGridAcrylicBrush"
-                    BackgroundSource="HostBackdrop"
+                    BackgroundSource="Backdrop"
                     TintColor="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"
-                    TintOpacity="0.8"
-                    FallbackColor="{ThemeResource SystemAccentColorDark3}"
+                    TintOpacity="0.4"
+                    AlwaysUseFallback="False"
                 />
             </Grid.Background>
             <Grid.ColumnDefinitions>

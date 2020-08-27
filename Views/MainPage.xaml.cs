@@ -33,6 +33,7 @@ using Live_Music.Helpers;
 using Microsoft.Toolkit.Extensions;
 using System.Collections.ObjectModel;
 using Windows.UI.ViewManagement;
+using HSVColorPickers;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 //使用了HSVColorPickers,Win2D,Microsoft Toolkit和Windows UI
@@ -47,8 +48,8 @@ namespace Live_Music
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         public event PropertyChangedEventHandler PropertyChanged;
 
-        MusicInfomation musicInfomation = new MusicInfomation();
-        MusicService musicService = new MusicService();
+        MusicInfomation musicInfomation = App.musicInfomation;
+        MusicService musicService = App.musicService;
         MediaPlaybackItem mediaPlaybackItem;
 
         bool IsFirstTimeAddMusic = true;
@@ -78,12 +79,6 @@ namespace Live_Music
         {
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
-                case MediaPlaybackState.None:
-                    break;
-                case MediaPlaybackState.Opening:
-                    break;
-                case MediaPlaybackState.Buffering:
-                    break;
                 case MediaPlaybackState.Playing:
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                      {
@@ -212,20 +207,17 @@ namespace Live_Music
                 InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
 
                 MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                //MusicAlbumArtistProperties = musicProperties.AlbumArtist;
                 MusicArtistList.Add(musicProperties.AlbumArtist);
-                //MusicTitleProperties = musicProperties.Title;
                 MusicTitleList.Add(musicProperties.Title);
                 var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
                 await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
                 randomAccessStream.Seek(0);
                 await bitmapImage.SetSourceAsync(randomAccessStream);
-                //MusicImageProperties = bitmapImage;
                 MusicImageList.Add(bitmapImage);
 
                 ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
                 var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
-                //GridAcrylicBrushColorProperties = color;
+                
                 MusicGirdColorsList.Add(color);
 
                 MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));

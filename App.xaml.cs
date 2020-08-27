@@ -26,6 +26,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using Live_Music.Helpers;
+using Live_Music.Services;
 
 namespace Live_Music
 {
@@ -51,6 +53,9 @@ namespace Live_Music
             //内存增加到上限值时的操作
             MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased;
         }
+        public static MusicInfomation musicInfomation = new MusicInfomation();
+        public static MusicService musicService = new MusicService();
+
         ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
         ApplicationDataCompositeValue SuspendedData = new Windows.Storage.ApplicationDataCompositeValue();
         private int UnhandledExceptionCount = 0;

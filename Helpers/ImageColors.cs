@@ -85,6 +85,7 @@ namespace Live_Music.Helpers
                         //饱和度总和
                         sumV += hsv.V;
                         count++;
+                        notBlackWhite.Add(item);
                     }
 
                     double avgH = sumHue / count;
@@ -124,7 +125,6 @@ namespace Live_Music.Helpers
 
                     color = Color.FromArgb(255, (byte)r, (byte)g, (byte)b);
                 });
-
                 colors = null;
                 return color;
             }

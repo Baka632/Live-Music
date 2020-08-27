@@ -28,15 +28,29 @@ namespace Live_Music.Views
     /// </summary>
     public sealed partial class CompactPage : Page
     {
-        MusicInfomation musicInfomation = new MusicInfomation();
-        MusicService musicService = new MusicService();
-        
+        MusicInfomation musicInfomation = App.musicInfomation;
+        MusicService musicService = App.musicService;
+
         public CompactPage()
         {
             this.InitializeComponent();
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
             NavigationCacheMode = NavigationCacheMode.Required;
+            switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
+            {
+                case MediaPlaybackState.Playing:
+                    musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = 27 };
+                    break;
+                case MediaPlaybackState.Paused:
+                    musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = 27 };
+                    break;
+                default:
+                    ChangeMusicPlayerVisibility(musicService.mediaPlayer.PlaybackSession.PlaybackState);
+                    break;
+            }
         }
+
+
 
         private void ExitCompactPageMode(object sender, RoutedEventArgs e)
         {
@@ -55,18 +69,21 @@ namespace Live_Music.Views
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
                 case MediaPlaybackState.None:
+                    ChangeMusicPlayerVisibility(MediaPlaybackState.None);
                     break;
                 case MediaPlaybackState.Opening:
                     break;
                 case MediaPlaybackState.Buffering:
                     break;
                 case MediaPlaybackState.Playing:
+                    ChangeMusicPlayerVisibility(MediaPlaybackState.Playing);
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = 27 };
                     });
                     break;
                 case MediaPlaybackState.Paused:
+                    ChangeMusicPlayerVisibility(MediaPlaybackState.Paused);
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = 27 };
@@ -76,5 +93,29 @@ namespace Live_Music.Views
                     break;
             }
         }
+
+        private async void ChangeMusicPlayerVisibility(MediaPlaybackState state)
+        {
+            if (state == MediaPlaybackState.None)
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    musicInfoGrid.Visibility = Visibility.Collapsed;
+                    noneMusicStackPanel.Visibility = Visibility.Visible;
+                });
+            }
+            else
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    musicInfoGrid.Visibility = Visibility.Visible;
+                    noneMusicStackPanel.Visibility = Visibility.Collapsed;
+                });
+            }
+        }
+
+        private void PreviousMusic(object sender, RoutedEventArgs e) => musicService.PreviousMusic();
+
+        private void NextMusic(object sender, RoutedEventArgs e) => musicService.NextMusic();
     }
 }
