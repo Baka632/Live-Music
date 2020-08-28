@@ -57,14 +57,35 @@ namespace Live_Music
             MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased; //内存增加到上限值时的操作
         }
 
+        /// <summary>
+        /// 音乐信息的实例
+        /// </summary>
         public static MusicInfomation musicInfomation = new MusicInfomation();
+        /// <summary>
+        /// 音乐服务的实例
+        /// </summary>
         public static MusicService musicService = new MusicService();
 
+        /// <summary>
+        /// 访问本地设置的实例
+        /// </summary>
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         ApplicationDataCompositeValue SuspendedData = new ApplicationDataCompositeValue();
+        /// <summary>
+        /// 在用户代码中未处理的异常的出现数量
+        /// </summary>
         private int UnhandledExceptionCount = 0;
+        /// <summary>
+        /// 异常的详细信息
+        /// </summary>
         public static string[] UnhandledExceptionMessage = {"FullName","Message"};
+        /// <summary>
+        /// 此值指示未处理的异常是否出现了三次
+        /// </summary>
         public static bool IsExceptionHappenedOverThree = false;
+        /// <summary>
+        /// 此值指示应用是否在后台模式
+        /// </summary>
         bool IsInBackgroundMode;
 
         /// <summary>
@@ -183,6 +204,10 @@ namespace Live_Music
             {
                 Debug.WriteLine("正在卸载主页面内容");
                 Window.Current.Content = null;
+                Debug.WriteLine("正在清理音乐及其信息服务的资源...");
+                musicService.DisposeMusicService();
+                musicInfomation.ResetAllMusicProperties();
+                Debug.WriteLine("完成。");
             }
             Debug.WriteLine("正强制启动垃圾回收器");
             GC.Collect();
@@ -201,6 +226,11 @@ namespace Live_Music
                 rootFrame = new Frame();
                 rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
                 rootFrame.NavigationFailed += OnNavigationFailed;
+
+                //重新实例化音乐及其信息服务
+                musicInfomation = new MusicInfomation();
+                musicService = new MusicService();
+
                 if (previousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: 从之前挂起的应用程序加载状态
