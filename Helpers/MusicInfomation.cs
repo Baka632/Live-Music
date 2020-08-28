@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -15,7 +16,10 @@ namespace Live_Music.Helpers
     public class MusicInfomation : DependencyObject, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        public bool IsUserMode = false;
 
+        double MusicVolume = 1;
         string MusicAlbumArtist = "";
         string MusicTitle = "";
         string MusicLenth = "";
@@ -29,12 +33,44 @@ namespace Live_Music.Helpers
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             });
         }
+
         public void ResetAllMusicProperties()
         {
             MusicAlbumArtistProperties = "";
             MusicImageProperties = null;
             MusicTitleProperties = "";
             MusicLenthProperties = "0:00";
+        }
+
+        public double MusicVolumeProperties
+        {
+            get 
+            {
+                if (localSettings.Values["MusicVolume"] != null && IsUserMode == false)
+                {
+                    IsUserMode = true;
+                    MusicVolume = (double)localSettings.Values["MusicVolume"];
+                    return (double)localSettings.Values["MusicVolume"];
+                }
+                else
+                {
+                    return MusicVolume;
+                }
+            }
+            set
+            {
+                if (IsUserMode == false)
+                {
+                    IsUserMode = true;
+                    MusicVolume = (double)localSettings.Values["MusicVolume"];
+                }
+                else
+                {
+                    MusicVolume = value;
+                }
+                App.musicService.SetMusicPlayerVolume(MusicVolume);
+                OnPropertiesChanged();
+            }
         }
 
         public string MusicAlbumArtistProperties

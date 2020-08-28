@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.Media.Playback;
+using Windows.Storage;
 using Windows.UI.Xaml;
 
 namespace Live_Music.Services
@@ -13,18 +15,32 @@ namespace Live_Music.Services
     {
         public MediaPlayer mediaPlayer = new MediaPlayer();
         public MediaPlaybackList mediaPlaybackList = new MediaPlaybackList();
-
+        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        bool IsSetStoredVolume = true;
         public MusicService()
         {
-            mediaPlayer.Volume = 1;
             mediaPlayer.AutoPlay = false;
-            
+            mediaPlayer.Volume = App.musicInfomation.MusicVolumeProperties;
         }
 
         public void StopMusic()
         {
             mediaPlayer.Pause();
             mediaPlaybackList.Items.Clear();
+        }
+
+        public void SetMusicPlayerVolume(double Volume)
+        {
+            if (IsSetStoredVolume == true)
+            {
+                IsSetStoredVolume = false;
+                mediaPlayer.Volume = (double)localSettings.Values["MusicVolume"];
+                App.musicInfomation.MusicVolumeProperties = (double)localSettings.Values["MusicVolume"];
+            }
+            else
+            {
+                mediaPlayer.Volume = Volume;
+            }
         }
 
         public void PreviousMusic()

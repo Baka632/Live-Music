@@ -28,6 +28,8 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Live_Music.Helpers;
 using Live_Music.Services;
+using Windows.UI.Core.Preview;
+using Windows.UI.Core;
 
 namespace Live_Music
 {
@@ -44,20 +46,22 @@ namespace Live_Music
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
             this.UnhandledException += AppExceptionHandler; //应用程序层级的异常处理
+
             //进入或退出后台时进行管理
             this.EnteredBackground += AppEnteredBackground;
             this.LeavingBackground += AppLeavingBackground;
-            //内存限制改变时的操作
-            MemoryManager.AppMemoryUsageLimitChanging += AppMemoryUsageLimitChanging;
-            //内存增加到上限值时的操作
-            MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased;
+            
+            MemoryManager.AppMemoryUsageLimitChanging += AppMemoryUsageLimitChanging; //内存限制改变时的操作
+            MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased; //内存增加到上限值时的操作
         }
+
         public static MusicInfomation musicInfomation = new MusicInfomation();
         public static MusicService musicService = new MusicService();
 
-        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-        ApplicationDataCompositeValue SuspendedData = new Windows.Storage.ApplicationDataCompositeValue();
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        ApplicationDataCompositeValue SuspendedData = new ApplicationDataCompositeValue();
         private int UnhandledExceptionCount = 0;
         public static string[] UnhandledExceptionMessage = {"FullName","Message"};
         public static bool IsExceptionHappenedOverThree = false;
@@ -121,6 +125,7 @@ namespace Live_Music
         private void AppEnteredBackground(object sender, EnteredBackgroundEventArgs e)
         {
             IsInBackgroundMode = true;
+            Debug.WriteLine("已进入后台");
         }
 
         /// <summary>
@@ -135,6 +140,7 @@ namespace Live_Music
             {
                 CreateRootFrame(ApplicationExecutionState.Running, string.Empty);
             }
+            Debug.WriteLine("已离开后台");
         }
 
         /// <summary>
@@ -144,6 +150,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void AppMemoryUsageLimitChanging(object sender, AppMemoryUsageLimitChangingEventArgs e)
         {
+            Debug.WriteLine("内存限制量发生了改变");
             if (MemoryManager.AppMemoryUsage >= e.NewLimit)
             {
                 ReduceMemoryUsage(e.NewLimit);
@@ -160,6 +167,7 @@ namespace Live_Music
             var level = MemoryManager.AppMemoryUsageLevel;
             if (level == AppMemoryUsageLevel.OverLimit || level == AppMemoryUsageLevel.High)
             {
+                Debug.WriteLine("警告:内存使用量到达上限");
                 ReduceMemoryUsage(MemoryManager.AppMemoryUsageLimit);
             }
         }
@@ -170,10 +178,13 @@ namespace Live_Music
         /// <param name="limit"></param>
         public void ReduceMemoryUsage(ulong limit)
         {
+            Debug.WriteLine("正在尝试减少应用内存使用量");
             if (IsInBackgroundMode==true && Window.Current.Content != null)
             {
+                Debug.WriteLine("正在卸载主页面内容");
                 Window.Current.Content = null;
             }
+            Debug.WriteLine("正强制启动垃圾回收器");
             GC.Collect();
         }
 
@@ -193,6 +204,7 @@ namespace Live_Music
                 if (previousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: 从之前挂起的应用程序加载状态
+                    musicService.mediaPlayer.Volume = (double)localSettings.Values["MusicVolume"];
                 }
                 Window.Current.Content = rootFrame;
             }
@@ -200,6 +212,40 @@ namespace Live_Music
             {
                 rootFrame.Navigate(typeof(MainPage), arguments);
             }
+            NotifyUserContectLost();
+        }
+
+        /// <summary>
+        /// 通知用户内容可能已经丢失,这是通过Toast通知实现的
+        /// </summary>
+        private void NotifyUserContectLost()
+        {
+            var toastContent = new ToastContent()
+            {
+                Visual = new ToastVisual()
+                {
+                    BindingGeneric = new ToastBindingGeneric()
+                    {
+                        Children =
+            {
+                new AdaptiveText()
+                {
+                    Text = "非常抱歉"
+                },
+                new AdaptiveText()
+                {
+                    Text = "因为内存限制,应用的某些内容可能已经丢失"
+                }
+            }
+                    }
+                }
+            };
+
+            // Create the toast notification
+            var toastNotif = new ToastNotification(toastContent.GetXml());
+
+            // And send the notification
+            ToastNotificationManager.CreateToastNotifier().Show(toastNotif);
         }
 
         private void OnBackRequested(object sender, Windows.UI.Core.BackRequestedEventArgs e)
@@ -244,7 +290,7 @@ namespace Live_Music
             }
 
             //当系统收到回退请求(BackRequested)的时候，就会调用方法OnBackRequested来处理该事件
-            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
+            SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
 
             // 隐藏标题栏
             var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
@@ -269,6 +315,8 @@ namespace Live_Music
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: 从之前挂起的应用程序加载状态
+                    Debug.WriteLine("上次的状态:挂起后被关闭");
+                    Debug.WriteLine("已自动恢复以下信息:播放器音量");
                 }
 
                 // 将框架放在当前窗口中
@@ -322,6 +370,12 @@ namespace Live_Music
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
+            Debug.WriteLine("将要进入挂起态");
+
+            localSettings.Values["MusicVolume"] = musicService.mediaPlayer.Volume; //保存现在的音量
+            Debug.WriteLine("==已保存现在的音量==");
+
+            Debug.WriteLine("进入挂起态");
             deferral.Complete();
         }
     }

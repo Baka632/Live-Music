@@ -66,13 +66,19 @@ namespace Live_Music
             this.InitializeComponent();
             pausePlayingButton.IsEnabled = false;
             stopPlayingButton.IsEnabled = false;
+
             fontIcon.FontFamily = fontFamily;
+
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
-            mediaControlStackPanel.Visibility = Visibility.Collapsed;
-            musicProcessStackPanel.Visibility = Visibility.Collapsed;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+
+            mediaControlStackPanel.Visibility = Visibility.Collapsed;
+            musicProcessStackPanel.Visibility = Visibility.Collapsed;
+
             NavigationCacheMode = NavigationCacheMode.Required;
+
+            volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
         }
 
         private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
@@ -187,8 +193,6 @@ namespace Live_Music
             IsSuperButtonShown = false;
         }
 
-        private void Clear(object sender, RoutedEventArgs e) => localSettings.Values.Remove("FirstStart");
-
         private void LeadToException(object sender, RoutedEventArgs e) => throw new ArgumentException("Exception");
 
         private async void OpenMusicFile(object sender, RoutedEventArgs e)
@@ -283,7 +287,8 @@ namespace Live_Music
 
         private void VolumeChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            musicService.mediaPlayer.Volume = e.NewValue / 100;
+            musicInfomation.MusicVolumeProperties = e.NewValue / 100;
+
             ChangeVolumeButtonGlyph(musicService.mediaPlayer.Volume);
             if (musicService.mediaPlayer.IsMuted == true)
             {
@@ -379,6 +384,11 @@ namespace Live_Music
             CompactPageService compactPageService = new CompactPageService();
             compactPageService.CompactOverlayMode();
             Frame.Navigate(typeof(Views.CompactPage), null, new SuppressNavigationTransitionInfo());
+        }
+
+        private void SaveVolume(object sender, RoutedEventArgs e)
+        {
+            //localSettings.Values["MusicVolume"] = musicService.mediaPlayer.Volume;
         }
     }
 }
