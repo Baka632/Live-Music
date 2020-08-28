@@ -4,9 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Live_Music"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    >
     <Page.Resources>
         <ResourceDictionary>
             <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">
@@ -170,7 +172,7 @@
             </Style>
         </ResourceDictionary>
     </Page.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -178,10 +180,154 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="superButtonGrid" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.RowSpan="2" Grid.Column="1" Width="50" Visibility="Collapsed" PointerExited="HideSuperButton" Background="{ThemeResource SystemControlAcrylicElementBrush}">
+        <muxc:NavigationView x:Name="mainPageNavigtationView"  IsTitleBarAutoPaddingEnabled="False" PaneDisplayMode="Auto" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
+            <muxc:NavigationView.Resources>
+                <Style TargetType="muxc:NavigationViewItem" x:Name="mainPageNavigtationViewItemsStyle">
+                    <Setter Property="Height" Value="20"/>
+                </Style>
+            </muxc:NavigationView.Resources>
+            
+            <muxc:NavigationView.MenuItems>
+                <muxc:NavigationViewItem Content="我的音乐" x:Name="myMusic">
+                    <muxc:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE189;"/>
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+                <muxc:NavigationViewItem Content="播放历史" x:Name="playingHistory">
+                    <muxc:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81C;" />
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+                <muxc:NavigationViewItem Content="正在播放" x:Name="nowPlaying">
+                    <muxc:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE142;" />
+                        <!--先凑合着用-->
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+            </muxc:NavigationView.MenuItems>
+
+            <muxc:NavigationView.AutoSuggestBox>
+                <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search" CornerRadius="0" Height="35" PlaceholderText="搜索" BorderBrush="Black"/>
+            </muxc:NavigationView.AutoSuggestBox>
+
+            <Frame x:Name="mainContectFrame"/>
+
+        </muxc:NavigationView>
+        
+        <Grid HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1">
+            <Grid.Background>
+                <AcrylicBrush x:Name="musicNowPlayingGridAcrylicBrush"
+                        BackgroundSource="Backdrop"
+                        TintColor="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"
+                        TintOpacity="0.5"
+                        AlwaysUseFallback="False"
+                    />
+            </Grid.Background>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="282"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="6"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="61.6"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource ButtonFontIconStyle}" x:Key="musicControlButtonStyle">
+                    <Setter Property="Height" Value="51"/>
+                    <Setter Property="Width" Value="51"/>
+                </Style>
+                <Style TargetType="ToggleButton" x:Key="musicControlToggleButtonStyle" BasedOn="{StaticResource ToggleButtonRevealStyle}">
+                    <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="Height" Value="37"/>
+                    <Setter Property="Width" Value="37"/>
+                    <Setter Property="Margin" Value="5,0,5,0"/>
+                    <Setter Property="CornerRadius" Value="25"/>
+                </Style>
+            </Grid.Resources>
+
+            <Button x:Name="musicInfomationButton" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Image x:Name="musicImage" Grid.Column="0" Margin="0,0,10,0" HorizontalAlignment="Stretch" Stretch="UniformToFill" VerticalAlignment="Stretch" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
+                    <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="musicName" Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontSize="18" Grid.Row="0"/>
+                        <TextBlock x:Name="musicAlbumArtist" Margin="0,0,0,5" Grid.Row="1" Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontWeight="Bold" FontSize="16"/>
+                    </Grid>
+                </Grid>
+            </Button>
+
+            <StackPanel Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal" x:Name="mediaControlStackPanel">
+                <ToggleButton x:Name="shuffleMusicToggleButton" ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
+
+                <Button x:Name="previousMusicButton" Click="PreviousMusic" Content="&#xE100;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
+
+                <Button x:Name="pausePlayingButton" ToolTipService.ToolTip="{x:Bind NowPlayingProperties,Mode=OneWay}" FontSize="27" Content="&#xE102;" Click="PlayPauseMusic" Margin="6,0,6,0" Style="{StaticResource musicControlButtonStyle}" BorderBrush="#9f9f9f" BorderThickness="2">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                        <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+                <Button x:Name="nextMusicButton" Click="NextMusic" Content="&#xE101;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
+
+                <ToggleButton x:Name="repeatMusicButton" ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Content="&#xE1CD;" Style="{StaticResource musicControlToggleButtonStyle}"/>
+            </StackPanel>
+
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Height="35" Width="35" x:Name="muteButton" Content="&#xE995;" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
+
+                <Slider x:Name="volumeSlider" Width="100" ValueChanged="VolumeChanged"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
+
+                <Button x:Name="enterCompactOverlayModeButton" ToolTipService.ToolTip="进入最小模式" Click="EnterCompactOverlayMode" Margin="5,0,5,0" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#xE158;" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
+
+                <Button x:Name="openMusicButton" Click="OpenMusicFile" Content="&#xE1A5;" Style="{StaticResource ButtonFontIconStyle}" Margin="0,0,5,0"/>
+
+                <Button x:Name="moreOptionsFlyoutButton" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#xE10C;" Grid.Column="2" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel>
+                                <Button x:Name="stopPlayingButton" Click="StopMusic" CornerRadius="0" Background="Transparent" Style="{StaticResource ButtonRevealStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" Margin="0,0,5,0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="清空&quot;正在播放&quot;列表" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" x:Name="musicProcessStackPanel" Margin="0,5,0,0">
+                <TextBlock Text="0:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+                <Slider Width="350" Margin="5,0,5,0"/>
+                <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+            </StackPanel>
+
+        </Grid>
+
+        <Grid x:Name="superButtonGrid" HorizontalAlignment="Right" VerticalAlignment="Stretch" MaxWidth="210" Grid.Row="0" Grid.Column="2" Width="50" Visibility="Collapsed" PointerExited="HideSuperButton" Background="{ThemeResource SystemControlAcrylicElementBrush}">
             <Grid.Resources>
                 <ResourceDictionary>
                     <ResourceDictionary.ThemeDictionaries>
@@ -215,7 +361,7 @@
                 </TransitionCollection>
             </Grid.ChildrenTransitions>
 
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Grid.RowSpan="2">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button x:Name="searchButton" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" CornerRadius="0">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE094;"  Style="{ThemeResource FontIconForground}"/>
@@ -246,16 +392,20 @@
             </StackPanel>
         </Grid>
 
-        <Popup x:Name="PanePopup" Grid.Column="1" Margin="0,60,0,0" Grid.ColumnSpan="2">
+        <Popup x:Name="PanePopup" Grid.Column="2" Margin="0,60,0,0" Grid.RowSpan="2" RequestedTheme="Dark">
             <Popup.Child>
-                <StackPanel Width="200" Height="50" Background="{ThemeResource SystemControlBackgroundAccentBrush}" Orientation="Horizontal">
-                    <TextBlock Text="切噜切噜切啤啤切噜噜★" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                    <Button Click="ClosePopup"  VerticalAlignment="Top" Background="Transparent" CornerRadius="0">
+                <Grid Width="200" Height="50" Background="{ThemeResource SystemControlBackgroundAccentBrush}">
+                    <!--切噜切噜切啤啤切噜噜★-->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
+                        <ProgressRing IsActive="True" Width="25" Height="25" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBlock Text="正在更新媒体库..." FontSize="15" TextWrapping="WrapWholeWords"  VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <Button Click="ClosePopup"  VerticalAlignment="Top" Background="Transparent" CornerRadius="0" HorizontalAlignment="Right">
                         <Button.Content>
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8BB;" FontSize="10"/>
                         </Button.Content>
                     </Button>
-                </StackPanel>
+                </Grid>
             </Popup.Child>
 
             <Popup.ChildTransitions>
@@ -264,114 +414,5 @@
                 </TransitionCollection>
             </Popup.ChildTransitions>
         </Popup>
-
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2">
-            <Button Content="SaveVolumeValue" Click="SaveVolume" Margin="0,0,0,10"/>
-            <Button Content="Exception" Click="LeadToException"/>
-            <Button Content="Popup" Click="ShowPopup" Margin="0,10,0,10"/>
-            <Button x:Name="openMusicButton" Click="OpenMusicFile" Content="&#xE1A5;" Style="{StaticResource ButtonFontIconStyle}" Grid.Column="1"/>
-        </StackPanel>
-
-        <Grid HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
-            <Grid.Background>
-                <AcrylicBrush x:Name="musicNowPlayingGridAcrylicBrush"
-                    BackgroundSource="Backdrop"
-                    TintColor="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"
-                    TintOpacity="0.4"
-                    AlwaysUseFallback="False"
-                />
-            </Grid.Background>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="187"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="6"/>
-            </Grid.ColumnDefinitions>
-            
-            <Grid.RowDefinitions>
-                <RowDefinition Height="61.6"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            
-            <Grid.Resources>
-                <Style TargetType="Button" BasedOn="{StaticResource ButtonFontIconStyle}" x:Key="musicControlButtonStyle">
-                    <Setter Property="Height" Value="51"/>
-                    <Setter Property="Width" Value="51"/>
-                </Style>
-                <Style TargetType="ToggleButton" x:Key="musicControlToggleButtonStyle" BasedOn="{StaticResource ToggleButtonRevealStyle}">
-                    <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="FontSize" Value="16"/>
-                    <Setter Property="Height" Value="37"/>
-                    <Setter Property="Width" Value="37"/>
-                    <Setter Property="Margin" Value="5,0,5,0"/>
-                    <Setter Property="CornerRadius" Value="25"/>
-                </Style>
-            </Grid.Resources>
-
-            <Button x:Name="musicInfomationButton" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="90"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Image x:Name="musicImage" Grid.Column="0" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock x:Name="musicName" Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontSize="18"/>
-                        <TextBlock x:Name="musicAlbumArtist" Margin="0,0,0,5" Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontWeight="Bold" FontSize="16"/>
-                    </StackPanel>
-                </Grid>
-            </Button>
-
-            <StackPanel Margin="0,5,0,0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" x:Name="mediaControlStackPanel">
-                <ToggleButton x:Name="shuffleMusicToggleButton" ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
-
-                <Button x:Name="previousMusicButton" Click="PreviousMusic" Content="&#xE100;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
-
-                <Button x:Name="pausePlayingButton" ToolTipService.ToolTip="{x:Bind NowPlayingProperties,Mode=OneWay}" FontSize="27" Content="&#xE102;" Click="PlayPauseMusic" Margin="6,0,6,0" Style="{StaticResource musicControlButtonStyle}" BorderBrush="#9f9f9f" BorderThickness="2">
-                    <Button.KeyboardAccelerators>
-                        <KeyboardAccelerator Modifiers="None" Key="Space"/>
-                        <KeyboardAccelerator Modifiers="Control" Key="P"/>
-                    </Button.KeyboardAccelerators>
-                </Button>
-
-                <Button x:Name="nextMusicButton" Click="NextMusic" Content="&#xE101;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
-
-                <ToggleButton x:Name="repeatMusicButton" ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Content="&#xE1CD;" Style="{StaticResource musicControlToggleButtonStyle}"/>
-            </StackPanel>
-
-
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Height="35" Width="35" x:Name="muteButton" Content="&#xE995;" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
-
-                <Slider x:Name="volumeSlider" Width="100" ValueChanged="VolumeChanged"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
-
-                <Button x:Name="enterCompactOverlayModeButton" ToolTipService.ToolTip="进入最小模式" Click="EnterCompactOverlayMode" Margin="5,0,5,0" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#xE158;" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
-
-                <Button x:Name="moreOptionsFlyoutButton" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#xE10C;" Grid.Column="2" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
-                    <Button.Flyout>
-                        <Flyout>
-                            <StackPanel>
-                                <Button x:Name="stopPlayingButton" Click="StopMusic" CornerRadius="0" Background="Transparent" Style="{StaticResource ButtonRevealStyle}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" Margin="0,0,5,0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        <TextBlock Text="清空&quot;正在播放&quot;列表" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1" x:Name="musicProcessStackPanel">
-                <TextBlock Text="0:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
-                <Slider Width="350" Margin="5,0,5,0"/>
-                <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
-            </StackPanel>
-
-        </Grid>
     </Grid>
 </Page>

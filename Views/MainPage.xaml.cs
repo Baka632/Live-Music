@@ -33,10 +33,9 @@ using Live_Music.Helpers;
 using Microsoft.Toolkit.Extensions;
 using System.Collections.ObjectModel;
 using Windows.UI.ViewManagement;
-using HSVColorPickers;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
-//使用了HSVColorPickers,Win2D,Microsoft Toolkit和Windows UI
+//使用了Microsoft Toolkit和Windows UI
 
 namespace Live_Music
 {
@@ -51,6 +50,7 @@ namespace Live_Music
         MusicInfomation musicInfomation = App.musicInfomation;
         MusicService musicService = App.musicService;
         MediaPlaybackItem mediaPlaybackItem;
+        public static Popup popup;
 
         bool IsFirstTimeAddMusic = true;
         bool IsSuperButtonShown = false;
@@ -67,6 +67,7 @@ namespace Live_Music
             pausePlayingButton.IsEnabled = false;
             stopPlayingButton.IsEnabled = false;
 
+            popup = PanePopup;
             fontIcon.FontFamily = fontFamily;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
@@ -79,6 +80,8 @@ namespace Live_Music
             NavigationCacheMode = NavigationCacheMode.Required;
 
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
+            mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
+            ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
         }
 
         private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
@@ -193,8 +196,6 @@ namespace Live_Music
             IsSuperButtonShown = false;
         }
 
-        private void LeadToException(object sender, RoutedEventArgs e) => throw new ArgumentException("Exception");
-
         private async void OpenMusicFile(object sender, RoutedEventArgs e)
         {
             var MusicPicker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -270,11 +271,6 @@ namespace Live_Music
         private void PlayPauseMusic(object sender, RoutedEventArgs e)
         {
             musicService.PlayPauseMusic();
-        }
-
-        private void ShowPopup(object sender, RoutedEventArgs e)
-        {
-           PanePopup.IsOpen = true;
         }
 
         private void ClosePopup(object sender, RoutedEventArgs e)
@@ -383,12 +379,7 @@ namespace Live_Music
         {
             CompactPageService compactPageService = new CompactPageService();
             compactPageService.CompactOverlayMode();
-            Frame.Navigate(typeof(Views.CompactPage), null, new SuppressNavigationTransitionInfo());
-        }
-
-        private void SaveVolume(object sender, RoutedEventArgs e)
-        {
-            //localSettings.Values["MusicVolume"] = musicService.mediaPlayer.Volume;
+            Frame.Navigate(typeof(Views.CompactPage), null, new DrillInNavigationTransitionInfo());
         }
     }
 }

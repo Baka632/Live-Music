@@ -55,6 +55,8 @@ namespace Live_Music
             
             MemoryManager.AppMemoryUsageLimitChanging += AppMemoryUsageLimitChanging; //内存限制改变时的操作
             MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased; //内存增加到上限值时的操作
+
+            FocusVisualKind = FocusVisualKind.Reveal;
         }
 
         /// <summary>
