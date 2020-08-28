@@ -38,19 +38,37 @@ namespace Live_Music.Views
         /// 音乐服务的实例
         /// </summary>
         MusicService musicService = App.musicService;
-
+        
+        /// <summary>
+        /// 初始化FrameContent类的新实例
+        /// </summary>
         public FrameContect()
         {
             this.InitializeComponent();
         }
 
+        /// <summary>
+        /// 保存当前播放器的音量
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SaveVolume(object sender, RoutedEventArgs e)
         {
             localSettings.Values["MusicVolume"] = musicService.mediaPlayer.Volume;
         }
 
+        /// <summary>
+        /// 抛出一个异常,这仅仅是为了测试
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LeadToException(object sender, RoutedEventArgs e) => throw new ArgumentException("Exception");
 
+        /// <summary>
+        /// 显示通知横幅
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShowPopup(object sender, RoutedEventArgs e)
         {
             MainPage.popup.IsOpen = true;

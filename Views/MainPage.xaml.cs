@@ -35,7 +35,7 @@ using System.Collections.ObjectModel;
 using Windows.UI.ViewManagement;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
-//使用了Microsoft Toolkit和Windows UI
+//使用了Win2D,Microsoft Toolkit和Windows UI
 
 namespace Live_Music
 {
@@ -44,23 +44,62 @@ namespace Live_Music
     /// </summary>
     public sealed partial class MainPage : Page , INotifyPropertyChanged
     {
+        /// <summary>
+        /// 访问本地设置的实例
+        /// </summary>
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// 音乐信息的实例
+        /// </summary>
         MusicInfomation musicInfomation = App.musicInfomation;
+        /// <summary>
+        /// 音乐服务的实例
+        /// </summary>
         MusicService musicService = App.musicService;
+        /// <summary>
+        /// 单个媒体播放项
+        /// </summary>
         MediaPlaybackItem mediaPlaybackItem;
+        /// <summary>
+        /// 通知横幅
+        /// </summary>
         public static Popup popup;
 
+        /// <summary>
+        /// 指示是否从启动以来第一次添加音乐
+        /// </summary>
         bool IsFirstTimeAddMusic = true;
+        /// <summary>
+        /// 指示"超级按钮"是否已显示
+        /// </summary>
         bool IsSuperButtonShown = false;
 
+        /// <summary>
+        /// 音乐艺术家的列表
+        /// </summary>
         ObservableCollection<string> MusicArtistList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐标题的列表
+        /// </summary>
         ObservableCollection<string> MusicTitleList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐缩略图的列表
+        /// </summary>
         ObservableCollection<BitmapImage> MusicImageList = new ObservableCollection<BitmapImage>();
+        /// <summary>
+        /// 音乐缩略图主题色的列表
+        /// </summary>
         ObservableCollection<Color> MusicGirdColorsList = new ObservableCollection<Color>();
+        /// <summary>
+        /// 音乐长度的列表
+        /// </summary>
         ObservableCollection<string> MusicLenthList = new ObservableCollection<string>();
 
+        /// <summary>
+        /// 初始化MainPage类的新实例
+        /// </summary>
         public MainPage()
         {
             this.InitializeComponent();
@@ -84,6 +123,11 @@ namespace Live_Music
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
         }
 
+        /// <summary>
+        /// 当播放器播放状态发生改变时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
         {
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
@@ -107,6 +151,10 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 通知系统属性已经发生更改
+        /// </summary>
+        /// <param name="propertyName">发生更改的属性名称,其填充是自动完成的</param>
         public async void OnPropertiesChanged([CallerMemberName] string propertyName = "")
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -115,6 +163,11 @@ namespace Live_Music
             });
         }
 
+        /// <summary>
+        /// 当媒体播放列表的当前播放项目发生更改时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
         {
             if (musicService.mediaPlaybackList.CurrentItem != null)
@@ -127,9 +180,22 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 正在播放的状态
+        /// </summary>
         string NowPlayingState = "播放";
+        /// <summary>
+        /// 循环播放的状态
+        /// </summary>
         string RepeatingMusicState = "循环播放:关";
+        /// <summary>
+        /// 随机播放的状态
+        /// </summary>
         string ShufflingMusicState = "随机播放:关";
+
+        /// <summary>
+        /// 播放器"正在播放"状态的属性
+        /// </summary>
         private string NowPlayingProperties
         {
             get => NowPlayingState;
@@ -139,6 +205,10 @@ namespace Live_Music
                 OnPropertiesChanged();
             }
         }
+
+        /// <summary>
+        /// 播放器"重复播放"状态的属性
+        /// </summary>
         private string RepeatingMusicProperties
         {
             get => RepeatingMusicState;
@@ -148,6 +218,10 @@ namespace Live_Music
                 OnPropertiesChanged();
             }
         }
+
+        /// <summary>
+        /// 播放器"循环播放"状态的属性
+        /// </summary>
         private string ShufflingMusicProperties
         {
             get => ShufflingMusicState;
@@ -158,7 +232,10 @@ namespace Live_Music
             }
         }
         
-        private void ResetMusicProperties()
+        /// <summary>
+        /// 重置音乐属性的列表
+        /// </summary>
+        private void ResetMusicPropertiesList()
         {
             musicInfomation.ResetAllMusicProperties();
             MusicGirdColorsList.Clear();
@@ -166,6 +243,12 @@ namespace Live_Music
             MusicImageList.Clear();
             MusicTitleList.Clear();
         }
+
+        /// <summary>
+        /// 当按下某个键时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
         {
             if (args.EventType.ToString().Contains("Down"))
@@ -190,12 +273,23 @@ namespace Live_Music
                 }
             }
         }
+
+        /// <summary>
+        /// 隐藏"超级按钮"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void HideSuperButton(object sender, RoutedEventArgs e)
         {
             superButtonGrid.Visibility = Visibility.Collapsed;
             IsSuperButtonShown = false;
         }
 
+        /// <summary>
+        /// 手动打开音乐文件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void OpenMusicFile(object sender, RoutedEventArgs e)
         {
             var MusicPicker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -243,15 +337,23 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 终止播放音乐
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void StopMusic(object sender, RoutedEventArgs e)
         {
             musicProcessStackPanel.Visibility = Visibility.Collapsed;
             stopPlayingButton.IsEnabled = false;
             ChangeMusicControlButtonsUsableState();
-            ResetMusicProperties();
+            ResetMusicPropertiesList();
             musicService.StopMusic();
         }
 
+        /// <summary>
+        /// 改变控制音乐播放的按钮的可用性
+        /// </summary>
         private void ChangeMusicControlButtonsUsableState()
         {
             if (pausePlayingButton.IsEnabled == nextMusicButton.IsEnabled == previousMusicButton.IsEnabled == false)
@@ -268,19 +370,41 @@ namespace Live_Music
                 IsFirstTimeAddMusic = true;
             }
         }
+
+        /// <summary>
+        /// 改变播放器播放的状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PlayPauseMusic(object sender, RoutedEventArgs e)
         {
             musicService.PlayPauseMusic();
         }
 
+        /// <summary>
+        /// 关闭弹出横幅
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ClosePopup(object sender, RoutedEventArgs e)
         {
            PanePopup.IsOpen = false;
         }
 
+        /// <summary>
+        /// FontIcon的实例
+        /// </summary>
         FontIcon fontIcon = new FontIcon();
+        /// <summary>
+        /// FontFamily的实例
+        /// </summary>
         FontFamily fontFamily = new FontFamily("Segoe MDL2 Assets");
 
+        /// <summary>
+        /// 当音量发生改变时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void VolumeChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             musicInfomation.MusicVolumeProperties = e.NewValue / 100;
@@ -292,6 +416,10 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 改变音量按钮的显示图标
+        /// </summary>
+        /// <param name="MediaPlayerVolume"></param>
         private void ChangeVolumeButtonGlyph(double MediaPlayerVolume)
         {
             if (MediaPlayerVolume > 0.6 && muteButton != null)
@@ -320,6 +448,11 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 改变播放器的静音状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MuteMusic(object sender, RoutedEventArgs e)
         {
             if (musicService.mediaPlayer.IsMuted == false)
@@ -335,10 +468,25 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 切换到上一个音乐
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PreviousMusic(object sender, RoutedEventArgs e) => musicService.PreviousMusic();
 
+        /// <summary>
+        /// 切换到下一个音乐
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextMusic(object sender, RoutedEventArgs e) => musicService.NextMusic();
 
+        /// <summary>
+        /// 改变播放器的"随机播放"属性
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShuffleMusic(object sender, RoutedEventArgs e)
         {
             musicService.ShuffleMusic();
@@ -352,6 +500,11 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 改变播放器"重复播放"的属性
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RepeatMusic(object sender, RoutedEventArgs e)
         {
             switch (repeatMusicButton.IsChecked)
@@ -375,6 +528,11 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 进入"最小模式"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EnterCompactOverlayMode(object sender, RoutedEventArgs e)
         {
             CompactPageService compactPageService = new CompactPageService();
