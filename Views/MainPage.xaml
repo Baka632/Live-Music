@@ -173,51 +173,49 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="210"/>
-        </Grid.ColumnDefinitions>
+    <Grid x:Name="mainPageGrid">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
-        <muxc:NavigationView x:Name="mainPageNavigtationView"  IsTitleBarAutoPaddingEnabled="False" PaneDisplayMode="Auto" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
-            <muxc:NavigationView.Resources>
+
+        <NavigationView x:Name="mainPageNavigtationView" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <NavigationView.Resources>
                 <Style TargetType="muxc:NavigationViewItem" x:Name="mainPageNavigtationViewItemsStyle">
                     <Setter Property="Height" Value="20"/>
                 </Style>
-            </muxc:NavigationView.Resources>
-            
-            <muxc:NavigationView.MenuItems>
-                <muxc:NavigationViewItem Content="我的音乐" x:Name="myMusic">
-                    <muxc:NavigationViewItem.Icon>
+            </NavigationView.Resources>
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="我的音乐" x:Name="myMusic" Tag="myMusic" IsSelected="True">
+                    <NavigationViewItem.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE189;"/>
-                    </muxc:NavigationViewItem.Icon>
-                </muxc:NavigationViewItem>
-                <muxc:NavigationViewItem Content="播放历史" x:Name="playingHistory">
-                    <muxc:NavigationViewItem.Icon>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="播放历史" x:Name="musicPlayedHistory" Tag="musicPlayedHistory">
+                    <NavigationViewItem.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81C;" />
-                    </muxc:NavigationViewItem.Icon>
-                </muxc:NavigationViewItem>
-                <muxc:NavigationViewItem Content="正在播放" x:Name="nowPlaying">
-                    <muxc:NavigationViewItem.Icon>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="正在播放" x:Name="nowPlaying" Tag="nowPlaying">
+                    <NavigationViewItem.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE142;" />
                         <!--先凑合着用-->
-                    </muxc:NavigationViewItem.Icon>
-                </muxc:NavigationViewItem>
-            </muxc:NavigationView.MenuItems>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
 
-            <muxc:NavigationView.AutoSuggestBox>
+            </NavigationView.MenuItems>
+
+            <NavigationView.AutoSuggestBox>
                 <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search" CornerRadius="0" Height="35" PlaceholderText="搜索" BorderBrush="Black"/>
-            </muxc:NavigationView.AutoSuggestBox>
+            </NavigationView.AutoSuggestBox>
 
             <Frame x:Name="mainContectFrame"/>
 
-        </muxc:NavigationView>
-        
-        <Grid HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1">
+        </NavigationView>
+
+        <Grid HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
             <Grid.Background>
                 <AcrylicBrush x:Name="musicNowPlayingGridAcrylicBrush"
                         BackgroundSource="Backdrop"
@@ -256,7 +254,7 @@
                 </Style>
             </Grid.Resources>
 
-            <Button x:Name="musicInfomationButton" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2">
+            <Button x:Name="musicInfomationButton" Width="auto" MaxWidth="350" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="90"/>
@@ -327,7 +325,7 @@
 
         </Grid>
 
-        <Grid x:Name="superButtonGrid" HorizontalAlignment="Right" VerticalAlignment="Stretch" MaxWidth="210" Grid.Row="0" Grid.Column="2" Width="50" Visibility="Collapsed" PointerExited="HideSuperButton" Background="{ThemeResource SystemControlAcrylicElementBrush}">
+        <Grid x:Name="superButtonGrid" HorizontalAlignment="Right" VerticalAlignment="Stretch" MaxWidth="210" Grid.Row="0" Width="50" Visibility="Collapsed" PointerExited="HideSuperButton" Background="{ThemeResource SystemControlAcrylicElementBrush}">
             <Grid.Resources>
                 <ResourceDictionary>
                     <ResourceDictionary.ThemeDictionaries>
@@ -392,7 +390,7 @@
             </StackPanel>
         </Grid>
 
-        <Popup x:Name="PanePopup" Grid.Column="2" Margin="0,60,0,0" Grid.RowSpan="2" RequestedTheme="Dark">
+        <Popup x:Name="panePopup" Margin="0,60,0,0" RequestedTheme="Dark">
             <Popup.Child>
                 <Grid Width="200" Height="50" Background="{ThemeResource SystemControlBackgroundAccentBrush}">
                     <!--切噜切噜切啤啤切噜噜★-->
@@ -414,5 +412,7 @@
                 </TransitionCollection>
             </Popup.ChildTransitions>
         </Popup>
+        
+        <TextBlock x:Name="titleTextBlock" Text="LIve Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
     </Grid>
 </Page>

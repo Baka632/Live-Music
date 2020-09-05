@@ -304,6 +304,7 @@ namespace Live_Music
         /// <param name="e">有关启动请求和过程的详细信息。</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
             Frame rootFrame = Window.Current.Content as Frame;
             Window.Current.Content = rootFrame;
             string ThemeSettings = (string)localSettings.Values["ThemeSetting"];

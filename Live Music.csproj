@@ -125,6 +125,9 @@
     <Compile Include="Helpers\MusicInfomation.cs" />
     <Compile Include="Services\CompactPageService.cs" />
     <Compile Include="Services\MusicService.cs" />
+    <Compile Include="Views\AppSettings.xaml.cs">
+      <DependentUpon>AppSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CompactPage.xaml.cs">
       <DependentUpon>CompactPage.xaml</DependentUpon>
     </Compile>
@@ -140,6 +143,9 @@
     <Compile Include="Helpers\FolderList.cs" />
     <Compile Include="Views\FrameContect.xaml.cs">
       <DependentUpon>FrameContect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MusicHistory.xaml.cs">
+      <DependentUpon>MusicHistory.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MusicLibrary.xaml.cs">
       <DependentUpon>MusicLibrary.xaml</DependentUpon>
@@ -219,6 +225,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\AppSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CompactPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -236,6 +246,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\FrameContect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MusicHistory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

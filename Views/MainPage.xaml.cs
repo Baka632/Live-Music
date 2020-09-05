@@ -33,6 +33,9 @@ using Live_Music.Helpers;
 using Microsoft.Toolkit.Extensions;
 using System.Collections.ObjectModel;
 using Windows.UI.ViewManagement;
+using Windows.ApplicationModel.Core;
+using Windows.Devices.Custom;
+using Live_Music.Views;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 //使用了Win2D,Microsoft Toolkit和Windows UI
@@ -106,7 +109,7 @@ namespace Live_Music
             pausePlayingButton.IsEnabled = false;
             stopPlayingButton.IsEnabled = false;
 
-            popup = PanePopup;
+            popup = panePopup;
             fontIcon.FontFamily = fontFamily;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
@@ -121,6 +124,29 @@ namespace Live_Music
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
+            //SetTitleBar();
+        }
+
+        /// <summary>
+        /// 设置自定义的标题栏可拖动区域
+        /// </summary>
+        private void SetTitleBar()
+        {
+            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+            // Set XAML element as a draggable region.
+            Window.Current.SetTitleBar(null);
+        }
+
+        /// <summary>
+        /// 当标题栏要响应大小更改时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
+        {
+            mainPageGrid.Height = sender.Height;
         }
 
         /// <summary>
@@ -388,7 +414,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void ClosePopup(object sender, RoutedEventArgs e)
         {
-           PanePopup.IsOpen = false;
+           panePopup.IsOpen = false;
         }
 
         /// <summary>
@@ -538,6 +564,45 @@ namespace Live_Music
             CompactPageService compactPageService = new CompactPageService();
             compactPageService.CompactOverlayMode();
             Frame.Navigate(typeof(Views.CompactPage), null, new DrillInNavigationTransitionInfo());
+        }
+
+        /// <summary>
+        /// 当主页面的显示状态发生改变时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void mainPageNavigtationView_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
+        {
+            if (args.DisplayMode == NavigationViewDisplayMode.Compact)
+            {
+                titleTextBlock.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                titleTextBlock.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void mainPageNavigtationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+        {
+            switch (args.InvokedItem)
+            {
+                case "我的音乐":
+                    if (mainContectFrame.CurrentSourcePageType != typeof(FrameContect))
+                    {
+                        mainContectFrame.Navigate(typeof(FrameContect), null);
+                    }
+                    break;
+                case "播放历史":
+                    mainContectFrame.Navigate(typeof(MusicHistory), null);
+                    break;
+                case "正在播放":
+                    break;
+            }
+            if (args.IsSettingsInvoked == true)
+            {
+                mainContectFrame.Navigate(typeof(AppSettings), null);
+            }
         }
     }
 }
