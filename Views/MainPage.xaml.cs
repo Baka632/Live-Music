@@ -115,6 +115,7 @@ namespace Live_Music
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+            musicService.mediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
 
             mediaControlStackPanel.Visibility = Visibility.Collapsed;
             musicProcessStackPanel.Visibility = Visibility.Collapsed;
@@ -125,6 +126,15 @@ namespace Live_Music
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
             //SetTitleBar();
+        }
+
+        private async void MediaPlayer_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+        {
+            ExceptionDetails.ExceptionDetailsDialog exceptionDetailsDialog = new ExceptionDetails.ExceptionDetailsDialog();
+            TextBlock textBlock = new TextBlock();
+            exceptionDetailsDialog.Title = "无法播放音乐";
+            exceptionDetailsDialog.Content = textBlock.Text = "这可能是因为文件已损坏,或者音乐文件的格式不受本应用支持。";
+            await exceptionDetailsDialog.ShowAsync();
         }
 
         /// <summary>
