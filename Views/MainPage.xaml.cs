@@ -45,7 +45,7 @@ namespace Live_Music
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class MainPage : Page , INotifyPropertyChanged
+    public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         /// <summary>
         /// 访问本地设置的实例
@@ -198,11 +198,13 @@ namespace Live_Music
         {
             if (musicService.mediaPlaybackList.CurrentItem != null)
             {
-                musicInfomation.MusicAlbumArtistProperties = MusicArtistList[(int)musicService.mediaPlaybackList.CurrentItemIndex];
-                musicInfomation.MusicTitleProperties = MusicTitleList[(int)musicService.mediaPlaybackList.CurrentItemIndex];
-                musicInfomation.MusicImageProperties = MusicImageList[(int)musicService.mediaPlaybackList.CurrentItemIndex];
-                musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[(int)musicService.mediaPlaybackList.CurrentItemIndex];
-                musicInfomation.MusicLenthProperties = MusicLenthList[(int)musicService.mediaPlaybackList.CurrentItemIndex];
+                int CurrentItemIndex = (int)musicService.mediaPlaybackList.CurrentItemIndex;
+
+                musicInfomation.MusicAlbumArtistProperties = MusicArtistList[CurrentItemIndex];
+                musicInfomation.MusicTitleProperties = MusicTitleList[CurrentItemIndex];
+                musicInfomation.MusicImageProperties = MusicImageList[CurrentItemIndex];
+                musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemIndex];
+                musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemIndex];
             }
         }
 
@@ -257,7 +259,7 @@ namespace Live_Music
                 OnPropertiesChanged();
             }
         }
-        
+
         /// <summary>
         /// 重置音乐属性的列表
         /// </summary>
@@ -312,7 +314,53 @@ namespace Live_Music
         }
 
         /// <summary>
-        /// 手动打开音乐文件
+        /// 直接打开音乐文件来播放音乐(应用外)
+        /// </summary>
+        /// <param name="file">传入的文件</param>
+        public async void OpenMusicFile(StorageFile file)
+        {
+            if (file != null)
+            {
+                ResetMusicPropertiesList();
+                musicService.mediaPlaybackList.Items.Clear();
+
+                BitmapImage bitmapImage = new BitmapImage();
+                InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
+
+                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+                MusicArtistList.Add(musicProperties.AlbumArtist);
+                MusicTitleList.Add(musicProperties.Title);
+                var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
+                await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
+                randomAccessStream.Seek(0);
+                await bitmapImage.SetSourceAsync(randomAccessStream);
+                MusicImageList.Add(bitmapImage);
+
+                ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
+                var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
+
+                MusicGirdColorsList.Add(color);
+
+                MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
+
+                mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
+                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
+                if (IsFirstTimeAddMusic == true)
+                {
+                    musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
+                    musicService.mediaPlayer.Play();
+                    ChangeMusicControlButtonsUsableState();
+                    IsFirstTimeAddMusic = false;
+                }
+                pausePlayingButton.IsEnabled = true;
+                stopPlayingButton.IsEnabled = true;
+                mediaControlStackPanel.Visibility = Visibility.Visible;
+                musicProcessStackPanel.Visibility = Visibility.Visible;
+            }
+        }
+
+        /// <summary>
+        /// 手动打开音乐文件(应用内)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -322,7 +370,8 @@ namespace Live_Music
             MusicPicker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
             MusicPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
             MusicPicker.FileTypeFilter.Add(".mp3");
-            MusicPicker.FileTypeFilter.Add(".wav"); // TODO: Add more file type
+            MusicPicker.FileTypeFilter.Add(".wav");
+            MusicPicker.FileTypeFilter.Add(".wma"); // TODO: Add more file type
 
             StorageFile file = await MusicPicker.PickSingleFileAsync();
 
@@ -342,7 +391,7 @@ namespace Live_Music
 
                 ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
                 var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
-                
+
                 MusicGirdColorsList.Add(color);
 
                 MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
@@ -414,7 +463,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void ClosePopup(object sender, RoutedEventArgs e)
         {
-           panePopup.IsOpen = false;
+            panePopup.IsOpen = false;
         }
 
         /// <summary>
@@ -541,7 +590,7 @@ namespace Live_Music
                     break;
                 case false:
                     musicService.RepeatMusic(true);
-                    repeatMusicButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE1CD" , FontSize = 16 };
+                    repeatMusicButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE1CD", FontSize = 16 };
                     RepeatingMusicProperties = "循环播放:关闭循环";
                     break;
                 case null:
@@ -583,6 +632,11 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 当导航视图上的元素被点击时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void mainPageNavigtationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             switch (args.InvokedItem)
@@ -594,15 +648,39 @@ namespace Live_Music
                     }
                     break;
                 case "播放历史":
-                    mainContectFrame.Navigate(typeof(MusicHistory), null);
+                    if (mainContectFrame.CurrentSourcePageType != typeof(FrameContect))
+                    {
+                        mainContectFrame.Navigate(typeof(MusicHistory), null);
+                    }
                     break;
                 case "正在播放":
+                    if (mainContectFrame.CurrentSourcePageType != typeof(FrameContect))
+                    {
+                        
+                    }
                     break;
             }
             if (args.IsSettingsInvoked == true)
             {
                 mainContectFrame.Navigate(typeof(AppSettings), null);
             }
+        }
+
+        /// <summary>
+        /// 重写的OnNavigatedTo方法,增加了处理外界传递的音乐文件的逻辑
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if (e.Parameter is StorageFile && e.Parameter != null)
+            {
+                OpenMusicFile((StorageFile)e.Parameter);
+            }
+            else
+            {
+                //Do nothing
+            }
+            base.OnNavigatedTo(e);
         }
     }
 }

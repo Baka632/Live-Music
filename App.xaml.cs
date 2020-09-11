@@ -411,5 +411,22 @@ namespace Live_Music
             Debug.WriteLine("进入挂起态");
             deferral.Complete();
         }
+
+        /// <summary>
+        /// 当应用打开某个音乐文件时调用的方法
+        /// </summary>
+        /// <param name="args"></param>
+        protected override void OnFileActivated(FileActivatedEventArgs args)
+        {
+            IStorageItem file = args.Files[0];
+            Frame frame = Window.Current.Content as Frame;
+            if (frame == null)
+            {
+                frame = new Frame();
+                Window.Current.Content = frame;
+            }
+            frame.Navigate(typeof(MainPage),(StorageFile)file);
+            Window.Current.Activate();
+        }
     }
 }
