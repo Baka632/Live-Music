@@ -371,6 +371,7 @@ namespace Live_Music
                     if (SystemInformation.IsFirstRun == true)
                     {
                         rootFrame.Navigate(typeof(FirstStart), null, new SuppressNavigationTransitionInfo());
+                        localSettings.Values["MusicVolume"] = 1d;
                     }
                     else
                     {
