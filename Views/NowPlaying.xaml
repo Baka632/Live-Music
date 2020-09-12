@@ -1,0 +1,243 @@
+﻿<Page
+    x:Class="Live_Music.Views.NowPlaying"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Live_Music.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    RequestedTheme="Dark">
+    <Page.Resources>
+        <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="#464646"/>
+        <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Width" Value="45"/>
+        </Style>
+        <Style x:Key="ToggleButtonRevealStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="{ThemeResource ToggleButtonRevealBackground}"/>
+            <Setter Property="Foreground" Value="{ThemeResource ToggleButtonForeground}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="{ThemeResource ToggleButtonRevealBorderThemeThickness}"/>
+            <Setter Property="Padding" Value="{ThemeResource ButtonPadding}"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+            <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}"/>
+            <Setter Property="FocusVisualMargin" Value="-3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="RootGrid.Background" Value="{ThemeResource ToggleButtonRevealBackgroundPointerOver}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushPointerOver}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundPointerOver}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="RootGrid.Background" Value="{ThemeResource ToggleButtonRevealBackgroundPressed}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushPressed}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundPressed}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerDownThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushDisabled}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundDisabled}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Checked">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushChecked}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundChecked}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="CheckedPointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushCheckedPointerOver}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundCheckedPointerOver}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="CheckedPressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushCheckedPressed}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundCheckedPressed}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerDownThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="CheckedDisabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushCheckedDisabled}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundCheckedDisabled}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Indeterminate">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushIndeterminate}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundIndeterminate}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="IndeterminatePointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushIndeterminatePointerOver}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundIndeterminatePointerOver}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="IndeterminatePressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushIndeterminatePressed}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundIndeterminatePressed}"/>
+                                        </VisualState.Setters>
+                                        <Storyboard>
+                                            <PointerDownThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="IndeterminateDisabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="RootGrid.Background" Value="{StaticResource ToggleButtonUncheckedCheckedIndeterminateBackground}"/>
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="{ThemeResource ToggleButtonRevealBorderBrushIndeterminateDisabled}"/>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource ToggleButtonForegroundIndeterminateDisabled}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter x:Name="ContentPresenter" AutomationProperties.AccessibilityView="Raw" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" CornerRadius="{TemplateBinding CornerRadius}" ContentTransitions="{TemplateBinding ContentTransitions}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ToggleButton" x:Key="musicControlToggleButtonStyle" BasedOn="{StaticResource ToggleButtonRevealStyle}">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Width" Value="45"/>
+            <Setter Property="Margin" Value="6,0,6,0"/>
+            <Setter Property="CornerRadius" Value="25"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <StackPanel x:Name="noneMusicStackPanel" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="请播放一些音乐,这里什么都没有。" FontSize="16" FontWeight="SemiBold"/>
+        </StackPanel>
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="musicInfoGrid">
+            <Grid.Background>
+                <AcrylicBrush
+                    BackgroundSource="HostBackdrop"
+                    TintColor="Gray"
+                    TintOpacity="0.9"
+                    FallbackColor="Gray"
+                />
+            </Grid.Background>
+
+            <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
+
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.Background>
+                    <AcrylicBrush TintOpacity="0.4" TintColor="Black"/>
+                </Grid.Background>
+
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="11,0,0,60">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Image Stretch="Fill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}" Width="100" Height="100"/>
+                        <StackPanel Margin="10,0,0,11" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontWeight="Bold" FontSize="25"/>
+                            <TextBlock Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontSize="20" FontWeight="SemiLight"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel x:Name="sliderStackPanel" Orientation="Horizontal" Margin="0,0,25,0" HorizontalAlignment="Stretch">
+                        <TextBlock Text="0:00" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Slider Value="10" Margin="5,0,5,0" Width="1185"/>
+                        <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE100;" Click="PreviousMusic"/>
+
+                        <Button x:Name="musicPlayPauseButton" Content="&#xE102;" Margin="6,0,6,0" Style="{StaticResource ButtonFontIconStyle}" Click="musicPlayPauseButton_Click">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                                <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                            </Button.KeyboardAccelerators>
+                        </Button>
+
+                        <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE101;" Click="NextMusic"/>
+
+                        <ToggleButton x:Name="shuffleMusicToggleButton" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource musicControlToggleButtonStyle}"/>
+
+                        <ToggleButton x:Name="repeatMusicButton" IsThreeState="True" Click="RepeatMusic" Content="&#xE1CD;" Margin="0,0,6,0" Style="{StaticResource musicControlToggleButtonStyle}"/>
+                        
+                        <Button Content="&#xE995;" FontSize="20" x:Name="volumeButton" Style="{StaticResource ButtonFontIconStyle}">
+                            <Button.Flyout>
+                                <Flyout>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Height="35" Width="35" FontSize="16" x:Name="muteButton" Content="&#xE995;" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
+                                        <Slider x:Name="volumeSlider" Width="100" ValueChanged="VolumeChanged"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Button Click="ExitNowPlaying" Content="&#xE944;" FontSize="20" Style="{StaticResource ButtonFontIconStyle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,10"/>
+    </Grid>
+</Page>

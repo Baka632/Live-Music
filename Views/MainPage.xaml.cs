@@ -655,15 +655,15 @@ namespace Live_Music
                     }
                     break;
                 case "播放历史":
-                    if (mainContectFrame.CurrentSourcePageType != typeof(FrameContect))
+                    if (mainContectFrame.CurrentSourcePageType != typeof(MusicHistory))
                     {
                         mainContectFrame.Navigate(typeof(MusicHistory), null);
                     }
                     break;
                 case "正在播放":
-                    if (mainContectFrame.CurrentSourcePageType != typeof(FrameContect))
+                    if (mainContectFrame.CurrentSourcePageType != typeof(NowPlaying))
                     {
-                        
+                        Frame.Navigate(typeof(NowPlaying), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
                     }
                     break;
             }
@@ -688,6 +688,16 @@ namespace Live_Music
                 //Do nothing
             }
             base.OnNavigatedTo(e);
+        }
+
+        /// <summary>
+        /// 进入"正在播放"页面
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EnterNowPlaying(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(NowPlaying), null, new EntranceNavigationTransitionInfo());
         }
     }
 }

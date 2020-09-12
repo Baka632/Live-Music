@@ -150,6 +150,9 @@
     <Compile Include="Views\MusicLibrary.xaml.cs">
       <DependentUpon>MusicLibrary.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\NowPlaying.xaml.cs">
+      <DependentUpon>NowPlaying.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Others.xaml.cs">
       <DependentUpon>Others.xaml</DependentUpon>
     </Compile>
@@ -256,6 +259,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MusicLibrary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NowPlaying.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

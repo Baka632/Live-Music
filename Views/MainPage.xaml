@@ -180,7 +180,7 @@
         </Grid.RowDefinitions>
 
 
-        <NavigationView x:Name="mainPageNavigtationView" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <NavigationView Background="{StaticResource SystemControlAltMediumLowAcrylicElementMediumBrush}" x:Name="mainPageNavigtationView" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <NavigationView.Resources>
                 <Style TargetType="muxc:NavigationViewItem" x:Name="mainPageNavigtationViewItemsStyle">
                     <Setter Property="Height" Value="20"/>
@@ -254,7 +254,7 @@
                 </Style>
             </Grid.Resources>
 
-            <Button x:Name="musicInfomationButton" Width="auto" MaxWidth="350" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2">
+            <Button x:Name="musicInfomationButton" Click="EnterNowPlaying" Width="auto" MaxWidth="350" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="90"/>
