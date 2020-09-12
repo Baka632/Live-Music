@@ -64,7 +64,6 @@
   </Applications>
 
   <Capabilities>
-    <rescap:Capability Name="confirmAppClose"/>
     <Capability Name="internetClientServer"/>
     <uap3:Capability Name="backgroundMediaPlayback"/>
     <uap:Capability Name="musicLibrary"/>

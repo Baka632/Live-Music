@@ -327,43 +327,16 @@ namespace Live_Music
         /// 直接打开音乐文件来播放音乐(应用外)
         /// </summary>
         /// <param name="file">传入的文件</param>
-        public async void OpenMusicFile(StorageFile file)
+        public void OpenMusicFile(StorageFile file)
         {
             if (file != null)
             {
                 ResetMusicPropertiesList();
-                musicService.mediaPlaybackList.Items.Clear();
-
-                BitmapImage bitmapImage = new BitmapImage();
-                InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
-
-                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                MusicArtistList.Add(musicProperties.AlbumArtist);
-                MusicTitleList.Add(musicProperties.Title);
-                var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
-                await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
-                randomAccessStream.Seek(0);
-                await bitmapImage.SetSourceAsync(randomAccessStream);
-                MusicImageList.Add(bitmapImage);
-
-                ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
-                var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
-
-                MusicGirdColorsList.Add(color);
-
-                MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
-
-                mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
-                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
-                if (IsFirstTimeAddMusic == true)
+                if (musicService.mediaPlaybackList.Items != null)
                 {
-                    musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
-                    musicService.mediaPlayer.Play();
-                    ChangeMusicControlButtonsUsableState();
-                    IsFirstTimeAddMusic = false;
+                    musicService.mediaPlaybackList.Items.Clear();
                 }
-                pausePlayingButton.IsEnabled = true;
-                stopPlayingButton.IsEnabled = true;
+                PlayAndGetMusicProperites(file);
                 mediaControlStackPanel.Visibility = Visibility.Visible;
                 musicProcessStackPanel.Visibility = Visibility.Visible;
             }
@@ -387,38 +360,60 @@ namespace Live_Music
 
             if (file != null)
             {
-                BitmapImage bitmapImage = new BitmapImage();
-                InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
-
-                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                MusicArtistList.Add(musicProperties.AlbumArtist);
-                MusicTitleList.Add(musicProperties.Title);
-                var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
-                await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
-                randomAccessStream.Seek(0);
-                await bitmapImage.SetSourceAsync(randomAccessStream);
-                MusicImageList.Add(bitmapImage);
-
-                ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
-                var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
-
-                MusicGirdColorsList.Add(color);
-
-                MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
-
-                mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
-                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
-                if (IsFirstTimeAddMusic == true)
-                {
-                    musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
-                    musicService.mediaPlayer.Play();
-                    ChangeMusicControlButtonsUsableState();
-                    IsFirstTimeAddMusic = false;
-                }
-                pausePlayingButton.IsEnabled = true;
-                stopPlayingButton.IsEnabled = true;
+                PlayAndGetMusicProperites(file);
                 mediaControlStackPanel.Visibility = Visibility.Visible;
                 musicProcessStackPanel.Visibility = Visibility.Visible;
+            }
+        }
+
+        /// <summary>
+        /// 播放音乐,以及获取音乐的属性
+        /// </summary>
+        /// <param name="file">传入的音乐文件</param>
+        private async void PlayAndGetMusicProperites(StorageFile file)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
+
+            MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+            if (string.IsNullOrWhiteSpace(musicProperties.Artist) != true)
+            {
+                MusicArtistList.Add(musicProperties.AlbumArtist);
+            }
+            else
+            {
+                MusicArtistList.Add("未知艺术家");
+            }
+
+            if (string.IsNullOrWhiteSpace(musicProperties.Title) != true)
+            {
+                MusicTitleList.Add(musicProperties.Title);
+            }
+            else
+            {
+                MusicTitleList.Add(file.Name);
+            }
+            var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
+            await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
+            randomAccessStream.Seek(0);
+            await bitmapImage.SetSourceAsync(randomAccessStream);
+            MusicImageList.Add(bitmapImage);
+
+            ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
+            var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
+
+            MusicGirdColorsList.Add(color);
+
+            MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
+
+            mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
+            musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
+            if (IsFirstTimeAddMusic == true)
+            {
+                musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
+                musicService.mediaPlayer.Play();
+                ChangeMusicControlButtonsUsableState();
+                IsFirstTimeAddMusic = false;
             }
         }
 
@@ -446,9 +441,11 @@ namespace Live_Music
                 pausePlayingButton.IsEnabled = true;
                 nextMusicButton.IsEnabled = true;
                 previousMusicButton.IsEnabled = true;
+                stopPlayingButton.IsEnabled = true;
             }
             else
             {
+                stopPlayingButton.IsEnabled = false;
                 pausePlayingButton.IsEnabled = false;
                 nextMusicButton.IsEnabled = false;
                 previousMusicButton.IsEnabled = false;
