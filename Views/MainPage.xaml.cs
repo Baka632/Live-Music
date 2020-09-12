@@ -415,6 +415,10 @@ namespace Live_Music
                 ChangeMusicControlButtonsUsableState();
                 IsFirstTimeAddMusic = false;
             }
+            if (musicService.mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.None || musicService.mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
+            {
+                musicService.mediaPlayer.Play();
+            }
         }
 
         /// <summary>
@@ -483,7 +487,7 @@ namespace Live_Music
         FontFamily fontFamily = new FontFamily("Segoe MDL2 Assets");
 
         /// <summary>
-        /// 当音量发生改变时调用的方法
+        /// 当volumeSlider的值发生改变时调用的方法
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

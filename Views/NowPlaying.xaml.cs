@@ -27,16 +27,31 @@ namespace Live_Music.Views
     /// </summary>
     public sealed partial class NowPlaying : Page
     {
+        /// <summary>
+        /// 音乐信息的实例
+        /// </summary>
         MusicInfomation musicInfomation = App.musicInfomation;
+        /// <summary>
+        /// 音乐服务的实例
+        /// </summary>
         MusicService musicService = App.musicService;
+        /// <summary>
+        /// fontIcon的实例
+        /// </summary>
         FontIcon fontIcon = new FontIcon();
+        /// <summary>
+        /// 页面上按钮中的FontIcon字号的大小,该字段为常量
+        /// </summary>
         private const int PlayPauseButtonFontSize = 20;
 
+        /// <summary>
+        /// 初始化NowPlaying类的新实例
+        /// </summary>
         public NowPlaying()
         {
             this.InitializeComponent();
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
-            NavigationCacheMode = NavigationCacheMode.Required;
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
                 case MediaPlaybackState.Playing:
@@ -54,6 +69,11 @@ namespace Live_Music.Views
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
         }
 
+        /// <summary>
+        /// 当MuteButton被加载时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MuteButton_Loaded(object sender, RoutedEventArgs e)
         {
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
@@ -132,16 +152,21 @@ namespace Live_Music.Views
             }
         }
 
-        private void ExitNowPlaying(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(MainPage), null,new EntranceNavigationTransitionInfo());
-        }
-
+        /// <summary>
+        /// 改变播放器的播放状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void musicPlayPauseButton_Click(object sender, RoutedEventArgs e)
         {
             musicService.PlayPauseMusic();
         }
 
+        /// <summary>
+        /// 当播放器的播放状态改变时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
         {
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
@@ -172,6 +197,10 @@ namespace Live_Music.Views
             }
         }
 
+        /// <summary>
+        /// 更改音乐播放控件的显示状态
+        /// </summary>
+        /// <param name="state">播放器的播放状态</param>
         private async void ChangeMusicPlayerVisibility(MediaPlaybackState state)
         {
             if (state == MediaPlaybackState.None)
@@ -192,8 +221,18 @@ namespace Live_Music.Views
             }
         }
 
+        /// <summary>
+        /// 切换到上一首音乐
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PreviousMusic(object sender, RoutedEventArgs e) => musicService.PreviousMusic();
 
+        /// <summary>
+        /// 切换到下一首音乐
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NextMusic(object sender, RoutedEventArgs e) => musicService.NextMusic();
 
         /// <summary>
@@ -228,6 +267,11 @@ namespace Live_Music.Views
             }
         }
 
+        /// <summary>
+        /// 当volumeSlider的值发生改变时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void VolumeChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             musicInfomation.MusicVolumeProperties = e.NewValue / 100;

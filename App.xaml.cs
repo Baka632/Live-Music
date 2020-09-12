@@ -294,6 +294,10 @@ namespace Live_Music
             {
                 e.Handled = true;
                 rootFrame.GoBack();
+                if (SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility == AppViewBackButtonVisibility.Visible)
+                {
+                    SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+                }
             }
         }
 

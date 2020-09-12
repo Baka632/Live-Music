@@ -99,30 +99,17 @@
                         </Style>
                     </ResourceDictionary>
                 </ResourceDictionary.ThemeDictionaries>
-
-                <DataTemplate x:Name="listViewDataTemplate" x:DataType="local:FolderList">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="showFolderNameTextBlock" Text="{x:Bind FolderName,Mode=OneWay}" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </DataTemplate>
             </ResourceDictionary>
         </StackPanel.Resources>
         
-        <TextBlock Text="要使应用能够访问除系统音乐库以外的文件夹,请选择一些文件夹(最多1000个)。" TextWrapping="Wrap" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,10"/>
+        <TextBlock Text="要使应用能够访问您的音乐文件夹,请将其添加到系统音乐库中。" TextWrapping="Wrap" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,10"/>
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="musicfolderButton" Click="ChooseMusicFolder">
+            <Button x:Name="musicfolderButton" Click="AddFolderToMusicLibrary">
                 <StackPanel Orientation="Horizontal">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xED25;" Margin="0,0,5,0"/>
-                    <TextBlock Text="选择文件夹..."/>
+                    <TextBlock Text="将文件夹添加到系统音乐库中"/>
                 </StackPanel>
             </Button>
-            <Button x:Name="clearFolderAccessButton" Content="清除对所有文件夹的访问权限..." Click="ClearFolderAccess" Margin="5,0,0,0"/>
         </StackPanel>
-        
-        <ScrollViewer>
-            <ListView x:Name="folderListView" ItemTemplate="{StaticResource listViewDataTemplate}"/>
-        </ScrollViewer>
-        
-        <TextBlock x:Name="warnTextBlock" Margin="0,10,0,0" Style="{StaticResource WarnTextBlockStyle}"/>
     </StackPanel>
 </Page>

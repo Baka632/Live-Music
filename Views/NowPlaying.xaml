@@ -222,7 +222,7 @@
                         <ToggleButton x:Name="shuffleMusicToggleButton" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource musicControlToggleButtonStyle}"/>
 
                         <ToggleButton x:Name="repeatMusicButton" IsThreeState="True" Click="RepeatMusic" Content="&#xE1CD;" Margin="0,0,6,0" Style="{StaticResource musicControlToggleButtonStyle}"/>
-                        
+
                         <Button Content="&#xE995;" FontSize="20" x:Name="volumeButton" Style="{StaticResource ButtonFontIconStyle}">
                             <Button.Flyout>
                                 <Flyout>
@@ -237,7 +237,5 @@
                 </StackPanel>
             </Grid>
         </Grid>
-
-        <Button Click="ExitNowPlaying" Content="&#xE944;" FontSize="20" Style="{StaticResource ButtonFontIconStyle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,10"/>
     </Grid>
 </Page>

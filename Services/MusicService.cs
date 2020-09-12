@@ -38,7 +38,7 @@ namespace Live_Music.Services
         /// </summary>
         public MusicService()
         {
-            mediaPlayer.AutoPlay = false;
+            mediaPlayer.AutoPlay = true;
             mediaPlayer.Volume = App.musicInfomation.MusicVolumeProperties;
         }
 
