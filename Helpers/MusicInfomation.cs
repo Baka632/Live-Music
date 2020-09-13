@@ -41,6 +41,10 @@ namespace Live_Music.Helpers
         /// </summary>
         string MusicTitle = "";
         /// <summary>
+        /// 音乐专辑名称,默认值为空("")
+        /// </summary>
+        string MusicAlbum = "";
+        /// <summary>
         /// 音乐长度,默认值为空("")
         /// </summary>
         string MusicLenth = "";
@@ -179,6 +183,19 @@ namespace Live_Music.Helpers
             set
             {
                 MusicLenth = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// 音乐的专辑名称属性
+        /// </summary>
+        public string MusicAlbumProperties
+        {
+            get => MusicAlbum;
+            set
+            {
+                MusicAlbum = value;
                 OnPropertiesChanged();
             }
         }

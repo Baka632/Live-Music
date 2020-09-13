@@ -52,6 +52,10 @@ namespace Live_Music
         /// </summary>
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// 磁贴助手的实例
+        /// </summary>
+        TileHelper tileHelper = new TileHelper();
 
         /// <summary>
         /// 音乐信息的实例
@@ -99,6 +103,10 @@ namespace Live_Music
         /// 音乐长度的列表
         /// </summary>
         ObservableCollection<string> MusicLenthList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐专辑名称的列表
+        /// </summary>
+        ObservableCollection<string> MusicAlbumList = new ObservableCollection<string>();
 
         /// <summary>
         /// 初始化MainPage类的新实例
@@ -128,6 +136,135 @@ namespace Live_Music
             //SetTitleBar();
         }
 
+        /// <summary>
+        /// 设置磁贴的源
+        /// </summary>
+        private async void SetTileSource()
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                var tileContent = new TileContent()
+                {
+                    Visual = new TileVisual()
+                    {
+                        TileSmall = new TileBinding()
+                        {
+                            Content = new TileBindingContentAdaptive()
+                            {
+                                BackgroundImage = new TileBackgroundImage()
+                                {
+                                    Source = "Assets/NullAlbum.png" //TODO: Change it to real image
+                                }
+                            }
+                        },
+                        TileMedium = new TileBinding()
+                        {
+                            Content = new TileBindingContentAdaptive()
+                            {
+                                Children =
+                                {
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicTitleProperties,
+                                        HintMaxLines = 2,
+                                        HintWrap = true,
+                                        HintAlign = AdaptiveTextAlign.Left
+                                    },
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicAlbumArtistProperties,
+                                        HintMaxLines = 1,
+                                        HintWrap = true
+                                    },
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicAlbumProperties,
+                                        HintMaxLines = 1,
+                                        HintWrap = true
+                                    }
+                                },
+                                PeekImage = new TilePeekImage()
+                                {
+                                    Source = "Assets/NullAlbum.png"
+                                }
+                            }
+                        },
+                        TileWide = new TileBinding()
+                        {
+                            Content = new TileBindingContentAdaptive()
+                            {
+                                Children =
+                                {
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicTitleProperties,
+                                        HintStyle = AdaptiveTextStyle.Subtitle,
+                                        HintMaxLines = 1,
+                                        HintWrap = true,
+                                        HintAlign = AdaptiveTextAlign.Left
+                                    },
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicAlbumArtistProperties,
+                                        HintMaxLines = 1,
+                                        HintWrap = true
+                                    },
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicAlbumProperties,
+                                        HintMaxLines = 1,
+                                        HintWrap = true
+                                    }
+                                },
+                                PeekImage = new TilePeekImage()
+                                {
+                                    Source = "Assets/NullAlbum.png"
+                                }
+                            }
+                        },
+                        TileLarge = new TileBinding()
+                        {
+                            Content = new TileBindingContentAdaptive()
+                            {
+                                Children =
+                                {
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicTitleProperties,
+                                        HintStyle = AdaptiveTextStyle.Title,
+                                        HintMaxLines = 3,
+                                        HintWrap = true,
+                                        HintAlign = AdaptiveTextAlign.Left
+                                    },
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicAlbumArtistProperties,
+                                        HintWrap = true
+                                    },
+                                    new AdaptiveText()
+                                    {
+                                        Text = musicInfomation.MusicAlbumProperties,
+                                        HintWrap = true
+                                    }
+                                },
+                                PeekImage = new TilePeekImage()
+                                {
+                                    Source = "Assets/NullAlbum.png"
+                                }
+                            }
+                        }
+                    }
+                };
+
+                tileHelper.ShowTitle(tileContent);
+            });
+        }
+
+        /// <summary>
+        /// 当播放器无法播放媒体时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private async void MediaPlayer_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
             ExceptionDetails.ExceptionDetailsDialog exceptionDetailsDialog = new ExceptionDetails.ExceptionDetailsDialog();
@@ -215,6 +352,12 @@ namespace Live_Music
                 musicInfomation.MusicImageProperties = MusicImageList[CurrentItemIndex];
                 musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemIndex];
                 musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemIndex];
+                musicInfomation.MusicAlbumProperties = MusicAlbumList[CurrentItemIndex];
+                SetTileSource();
+            }
+            else
+            {
+                tileHelper.DeleteTile();
             }
         }
 
@@ -393,6 +536,16 @@ namespace Live_Music
             {
                 MusicTitleList.Add(file.Name);
             }
+
+            if (string.IsNullOrWhiteSpace(musicProperties.Album) != true)
+            {
+                MusicAlbumList.Add(musicProperties.Album);
+            }
+            else
+            {
+                MusicAlbumList.Add("未知专辑");
+            }
+
             var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
             await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
             randomAccessStream.Seek(0);
