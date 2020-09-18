@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    RequestedTheme="Dark">
+    RequestedTheme="Dark"
+    Loaded="Page_Loaded">
     <Page.Resources>
         <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="#464646"/>
         <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">

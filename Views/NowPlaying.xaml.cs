@@ -51,7 +51,7 @@ namespace Live_Music.Views
         {
             this.InitializeComponent();
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
-            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+            NavigationCacheMode = NavigationCacheMode.Enabled;
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
                 case MediaPlaybackState.Playing:
@@ -281,6 +281,11 @@ namespace Live_Music.Views
             {
                 musicService.mediaPlayer.IsMuted = false;
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
         }
     }
 }
