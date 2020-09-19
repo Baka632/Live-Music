@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Live_Music.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -11,6 +13,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -22,6 +25,7 @@ namespace Live_Music.Views
     /// </summary>
     public sealed partial class MusicHistory : Page
     {
+        MusicInfomation musicInfomation = App.musicInfomation;
         public MusicHistory()
         {
             this.InitializeComponent();

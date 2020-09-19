@@ -5,14 +5,24 @@
     xmlns:local="using:Live_Music.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Live_Music.Helpers"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <CollectionViewSource x:Name="ContactsCVS"  IsSourceGrouped="True" />
+        <DataTemplate x:DataType="data:MusicInfomation" x:Key="musicHistroyDataTemplate">
+            <StackPanel>
+                <Image Source="{x:Bind MusicImageProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="90" Height="90"/>
+                <TextBlock Text="{x:Bind MusicAlbumProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Text="{x:Bind MusicAlbumArtistProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid>
         <TextBlock Text="播放历史"/>
-        
-        <GridView>
-            
-        </GridView>
+
+        <GridView ItemTemplate="{StaticResource musicHistroyDataTemplate}"/>
+
     </Grid>
 </Page>

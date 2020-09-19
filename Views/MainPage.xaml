@@ -180,7 +180,7 @@
         </Grid.RowDefinitions>
 
 
-        <NavigationView Background="{StaticResource SystemControlAltMediumLowAcrylicElementMediumBrush}" x:Name="mainPageNavigtationView" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <NavigationView Background="{StaticResource SystemControlAltMediumLowAcrylicElementMediumBrush}" x:Name="mainPageNavigtationView" IsBackEnabled="{x:Bind ContentFrameCanGoBack,Mode=OneWay}" BackRequested="mainPageNavigtationView_BackRequested" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <NavigationView.Resources>
                 <Style TargetType="muxc:NavigationViewItem" x:Name="mainPageNavigtationViewItemsStyle">
                     <Setter Property="Height" Value="20"/>

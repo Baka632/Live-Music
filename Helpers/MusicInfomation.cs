@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -22,7 +23,7 @@ namespace Live_Music.Helpers
         /// <summary>
         /// 访问本地设置的实例
         /// </summary>
-        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         /// <summary>
         /// 指示音量设置是否由用户控制的值
         /// </summary>
@@ -56,6 +57,31 @@ namespace Live_Music.Helpers
         /// 音乐缩略图主题色,默认值为系统资源'SystemAccentColorDark2'所定义的值
         /// </summary>
         Color MusicNowPlayingGridAcrylicBrushColor = (Color)Application.Current.Resources["SystemAccentColorDark2"];
+
+        /// <summary>
+        /// 音乐艺术家的列表
+        /// </summary>
+        public ObservableCollection<string> MusicArtistList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐标题的列表
+        /// </summary>
+        public ObservableCollection<string> MusicTitleList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐缩略图的列表
+        /// </summary>
+        public ObservableCollection<BitmapImage> MusicImageList = new ObservableCollection<BitmapImage>();
+        /// <summary>
+        /// 音乐缩略图主题色的列表
+        /// </summary>
+        public ObservableCollection<Color> MusicGirdColorsList = new ObservableCollection<Color>();
+        /// <summary>
+        /// 音乐长度的列表
+        /// </summary>
+        public ObservableCollection<string> MusicLenthList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐专辑名称的列表
+        /// </summary>
+        public ObservableCollection<string> MusicAlbumList = new ObservableCollection<string>();
 
         /// <summary>
         /// 初始化MusicInfomation的新实例

@@ -283,6 +283,11 @@ namespace Live_Music.Views
             }
         }
 
+        /// <summary>
+        /// 当页面被加载好时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
