@@ -72,15 +72,52 @@ namespace Live_Music.Views
             muteButton.Loaded += MuteButton_Loaded;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
-            MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick; ;
+            MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick;
+            processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
+            processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
         }
 
+        /// <summary>
+        /// 开始拖拽进度条是调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UIElement_EnterPressedReleased(object sender, PointerRoutedEventArgs e)
+        {
+            MainPage.IsPointerEntered = true;
+        }
+
+        /// <summary>
+        /// 结束拖拽进度条时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void UIElement_OnPointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(MainPage.SliderNewValue);
+            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            MainPage.IsPointerEntered = false;
+        }
+
+        /// <summary>
+        /// 当超过计时器间隔时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DispatcherTimer_Tick(object sender, object e)
         {
-            this.processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
-            this.musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            if (MainPage.IsPointerEntered == false)
+            {
+                processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
+                musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            }
         }
 
+        /// <summary>
+        /// 当媒体播放列表的当前播放项目发生更改时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private async void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -321,10 +358,18 @@ namespace Live_Music.Views
             }
         }
 
+        /// <summary>
+        /// 当进度条被拖动时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void processSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(e.NewValue);
-            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            MainPage.SliderNewValue = e.NewValue;
+            if (MainPage.IsPointerEntered)
+            {
+                musicNowPlayingTimeTextBlock.Text = TimeSpan.FromSeconds(e.NewValue).ToString(@"m\:ss");
+            }
         }
     }
 }

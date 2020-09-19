@@ -92,6 +92,8 @@ namespace Live_Music
         /// 从文件读取的音乐属性
         /// </summary>
         MusicProperties musicProperties;
+        public static double SliderNewValue;
+        public static bool IsPointerEntered = false;
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -181,12 +183,47 @@ namespace Live_Music
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
             processSlider.IsEnabled = false;
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += dispatcherTimer_Tick;
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
+            processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
         }
 
+        /// <summary>
+        /// 开始拖拽进度条是调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UIElement_EnterPressedReleased(object sender, PointerRoutedEventArgs e)
+        {
+            IsPointerEntered = true;
+        }
+
+        /// <summary>
+        /// 结束拖拽进度条时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void UIElement_OnPointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(SliderNewValue);
+            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            IsPointerEntered = false;
+        }
+
+        /// <summary>
+        /// 当超过计时器间隔时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dispatcherTimer_Tick(object sender, object e)
         {
-            processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
-            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            if (IsPointerEntered == false)
+            {
+                processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
+                musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            }
         }
 
         /// <summary>
@@ -221,10 +258,18 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 当进度条被拖动时调用的方法
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void processSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(e.NewValue);
-            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            SliderNewValue = e.NewValue;
+            if (IsPointerEntered)
+            {
+                musicNowPlayingTimeTextBlock.Text = TimeSpan.FromSeconds(e.NewValue).ToString(@"m\:ss");
+            }
         }
 
         /// <summary>
@@ -349,9 +394,8 @@ namespace Live_Music
                 {
                     processSlider.Maximum = musicInfomation.MusicDurationProperties;
                     processSlider.IsEnabled = true;
-                    dispatcherTimer = new DispatcherTimer();
-                    dispatcherTimer.Tick += dispatcherTimer_Tick;
-                    dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                    processSlider.Value = 0;
+                    musicNowPlayingTimeTextBlock.Text = "0:00";
                     dispatcherTimer.Start();
                 });
             }
