@@ -50,6 +50,10 @@ namespace Live_Music.Helpers
         /// </summary>
         string MusicLenth = "";
         /// <summary>
+        /// 音乐实际长度(未被转换为string),默认值为0
+        /// </summary>
+        double MusicDuration = 0;
+        /// <summary>
         /// 音乐缩略图,默认值为null
         /// </summary>
         BitmapImage MusicImage = null;
@@ -78,6 +82,10 @@ namespace Live_Music.Helpers
         /// 音乐长度的列表
         /// </summary>
         public ObservableCollection<string> MusicLenthList = new ObservableCollection<string>();
+        /// <summary>
+        /// 音乐实际长度的列表(未被转换为string)
+        /// </summary>
+        public ObservableCollection<double> MusicDurationList = new ObservableCollection<double>();
         /// <summary>
         /// 音乐专辑名称的列表
         /// </summary>
@@ -209,6 +217,19 @@ namespace Live_Music.Helpers
             set
             {
                 MusicLenth = value;
+                OnPropertiesChanged();
+            }
+        }
+        
+        /// <summary>
+        /// 音乐的实际时长属性(未被转换为string)
+        /// </summary>
+        public double MusicDurationProperties
+        {
+            get => MusicDuration;
+            set
+            {
+                MusicDuration = value;
                 OnPropertiesChanged();
             }
         }

@@ -318,8 +318,8 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" x:Name="musicProcessStackPanel" Margin="0,5,0,0">
-                <TextBlock Text="0:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
-                <Slider Width="350" Margin="5,0,5,0"/>
+                <TextBlock x:Name="musicNowPlayingTimeTextBlock" Text="0:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+                <Slider Width="350" Margin="5,0,5,0" x:Name="processSlider" IsThumbToolTipEnabled="False" IsEnabled="False" ValueChanged="processSlider_ValueChanged"/>
                 <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
             </StackPanel>
 

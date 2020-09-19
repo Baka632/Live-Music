@@ -43,6 +43,10 @@ namespace Live_Music.Views
         /// 页面上按钮中的FontIcon字号的大小,该字段为常量
         /// </summary>
         private const int PlayPauseButtonFontSize = 20;
+        /// <summary>
+        /// 指示是否第一次进入页面
+        /// </summary>
+        bool IsFirstTimeEnterPage = true;
 
         /// <summary>
         /// 初始化NowPlaying类的新实例
@@ -66,7 +70,23 @@ namespace Live_Music.Views
             }
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
             muteButton.Loaded += MuteButton_Loaded;
+            musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
+            MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick; ;
+        }
+
+        private void DispatcherTimer_Tick(object sender, object e)
+        {
+            this.processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
+            this.musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+        }
+
+        private async void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                processSlider.Maximum = musicInfomation.MusicDurationProperties;
+            });
         }
 
         /// <summary>
@@ -288,9 +308,23 @@ namespace Live_Music.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+            if (IsFirstTimeEnterPage)
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    processSlider.Maximum = musicInfomation.MusicDurationProperties;
+                });
+                IsFirstTimeEnterPage = false;
+            }
+        }
+
+        private void processSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(e.NewValue);
+            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
         }
     }
 }

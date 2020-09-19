@@ -80,7 +80,18 @@ namespace Live_Music
         /// 通知横幅
         /// </summary>
         public static Popup popup;
+        /// <summary>
+        /// 指示内嵌的Frame是否能够返回
+        /// </summary>
         bool _ContentFrameCanGoBack = false;
+        /// <summary>
+        /// 计时器DispatcherTimer的实例
+        /// </summary>
+        public static DispatcherTimer dispatcherTimer;
+        /// <summary>
+        /// 从文件读取的音乐属性
+        /// </summary>
+        MusicProperties musicProperties;
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -128,6 +139,10 @@ namespace Live_Music
         /// </summary>
         ObservableCollection<string> MusicLenthList;
         /// <summary>
+        /// 音乐实际长度的列表(未被转换为string)
+        /// </summary>
+        ObservableCollection<double> MusicDurationList;
+        /// <summary>
         /// 音乐专辑名称的列表
         /// </summary>
         ObservableCollection<string> MusicAlbumList;
@@ -160,11 +175,18 @@ namespace Live_Music
             MusicGirdColorsList = musicInfomation.MusicGirdColorsList;
             MusicLenthList = musicInfomation.MusicLenthList;
             MusicAlbumList = musicInfomation.MusicAlbumList;
+            MusicDurationList = musicInfomation.MusicDurationList;
 
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
-            //SetTitleBar();
+            processSlider.IsEnabled = false;
+        }
+
+        private void dispatcherTimer_Tick(object sender, object e)
+        {
+            processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
+            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
         }
 
         /// <summary>
@@ -177,28 +199,6 @@ namespace Live_Music
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             });
-        }
-
-        /// <summary>
-        /// 设置自定义的标题栏可拖动区域
-        /// </summary>
-        private void SetTitleBar()
-        {
-            var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
-            // Set XAML element as a draggable region.
-            Window.Current.SetTitleBar(null);
-        }
-
-        /// <summary>
-        /// 当标题栏要响应大小更改时调用的方法
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
-        {
-            mainPageGrid.Height = sender.Height;
         }
 
         /// <summary>
@@ -219,6 +219,12 @@ namespace Live_Music
                 musicService.mediaPlayer.IsMuted = false;
                 ChangeVolumeButtonGlyph(musicService.mediaPlayer.Volume);
             }
+        }
+
+        private void processSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(e.NewValue);
+            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
         }
 
         /// <summary>
@@ -324,7 +330,7 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
+        private async void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
         {
             if (musicService.mediaPlaybackList.CurrentItem != null)
             {
@@ -335,11 +341,26 @@ namespace Live_Music
                 musicInfomation.MusicImageProperties = MusicImageList[CurrentItemIndex];
                 musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemIndex];
                 musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemIndex];
+                musicInfomation.MusicDurationProperties = MusicDurationList[CurrentItemIndex];
                 musicInfomation.MusicAlbumProperties = MusicAlbumList[CurrentItemIndex];
                 SetTileSource();
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    processSlider.Maximum = musicInfomation.MusicDurationProperties;
+                    processSlider.IsEnabled = true;
+                    dispatcherTimer = new DispatcherTimer();
+                    dispatcherTimer.Tick += dispatcherTimer_Tick;
+                    dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                    dispatcherTimer.Start();
+                });
             }
             else
             {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    dispatcherTimer.Stop();
+                });
                 tileHelper.DeleteTile();
             }
         }
@@ -474,7 +495,7 @@ namespace Live_Music
             BitmapImage bitmapImage = new BitmapImage();
             InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
 
-            MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+            musicProperties = await file.Properties.GetMusicPropertiesAsync();
             if (string.IsNullOrWhiteSpace(musicProperties.Artist) != true)
             {
                 MusicArtistList.Add(musicProperties.AlbumArtist);
@@ -514,6 +535,7 @@ namespace Live_Music
             MusicGirdColorsList.Add(color);
 
             MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
+            MusicDurationList.Add(musicProperties.Duration.TotalSeconds);
 
             mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
             musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);

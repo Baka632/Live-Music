@@ -193,8 +193,14 @@
                     <AcrylicBrush TintOpacity="0.4" TintColor="Black"/>
                 </Grid.Background>
 
-                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="11,0,0,60">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="11,0,0,60">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" Grid.Row="0">
                         <Image Stretch="Fill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}" Width="100" Height="100"/>
                         <StackPanel Margin="10,0,0,11" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontWeight="Bold" FontSize="25"/>
@@ -202,13 +208,19 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel x:Name="sliderStackPanel" Orientation="Horizontal" Margin="0,0,25,0" HorizontalAlignment="Stretch">
-                        <TextBlock Text="0:00" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <Slider Value="10" Margin="5,0,5,0" Width="1185"/>
-                        <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </StackPanel>
+                    <Grid x:Name="sliderStackPanel" Grid.Row="1"  Margin="0,0,25,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <TextBlock x:Name="musicNowPlayingTimeTextBlock" Text="0:00" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Slider Margin="5,0,5,0" Grid.Column="1" x:Name="processSlider" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
+                        <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" Grid.Column="2" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <StackPanel HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Bottom" Orientation="Horizontal">
                         <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE100;" Click="PreviousMusic"/>
 
                         <Button x:Name="musicPlayPauseButton" Content="&#xE102;" Margin="6,0,6,0" Style="{StaticResource ButtonFontIconStyle}" Click="musicPlayPauseButton_Click">
@@ -235,7 +247,7 @@
                             </Button.Flyout>
                         </Button>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
