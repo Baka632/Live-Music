@@ -73,12 +73,12 @@ namespace Live_Music.Views
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
             MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick;
-            processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
-            processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
+            processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个方法处理*/, true /*如果在之前处理，是否还使用函数*/);
+            processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个方法处理*/, true /*如果在之前处理，是否还使用函数*/);
         }
 
         /// <summary>
-        /// 开始拖拽进度条是调用的方法
+        /// 开始拖拽进度条时调用的方法
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

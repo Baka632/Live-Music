@@ -94,6 +94,7 @@ namespace Live_Music
         MusicProperties musicProperties;
         public static double SliderNewValue;
         public static bool IsPointerEntered = false;
+        string AlbumSaveName = "";
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -191,7 +192,7 @@ namespace Live_Music
         }
 
         /// <summary>
-        /// 开始拖拽进度条是调用的方法
+        /// 开始拖拽进度条时调用的方法
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -388,6 +389,10 @@ namespace Live_Music
                 musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemIndex];
                 musicInfomation.MusicDurationProperties = MusicDurationList[CurrentItemIndex];
                 musicInfomation.MusicAlbumProperties = MusicAlbumList[CurrentItemIndex];
+                musicService.mediaPlaybackList.CurrentItem.GetDisplayProperties().MusicProperties.AlbumArtist = musicInfomation.MusicAlbumArtistProperties;
+                musicService.mediaPlaybackList.CurrentItem.GetDisplayProperties().MusicProperties.AlbumTitle = musicInfomation.MusicAlbumProperties;
+                musicService.mediaPlaybackList.CurrentItem.GetDisplayProperties().MusicProperties.Title = musicInfomation.MusicTitleProperties;
+                
                 SetTileSource();
 
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -408,6 +413,7 @@ namespace Live_Music
                 tileHelper.DeleteTile();
             }
         }
+
         /// <summary>
         /// 终止播放音乐
         /// </summary>
@@ -567,11 +573,19 @@ namespace Live_Music
                 MusicAlbumList.Add("未知专辑");
             }
 
-            var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.MusicView);
+            var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem);
             await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
             randomAccessStream.Seek(0);
             await bitmapImage.SetSourceAsync(randomAccessStream);
             MusicImageList.Add(bitmapImage);
+
+            AlbumSaveName = musicProperties.Album;
+            AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
+
+            using (var fileStream = File.Create($"{ApplicationData.Current.LocalCacheFolder.Path}\\{AlbumSaveName}.jpg"))
+            {
+                await WindowsRuntimeStreamExtensions.AsStreamForRead(thumbnail.GetInputStreamAt(0)).CopyToAsync(fileStream);
+            }
 
             ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
             var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
@@ -853,7 +867,8 @@ namespace Live_Music
                             {
                                 BackgroundImage = new TileBackgroundImage()
                                 {
-                                    Source = "Assets/NullAlbum.png" //TODO: Change it to real image
+                                    //Source = "Assets/NullAlbum.png"
+                                    Source = $"{ApplicationData.Current.LocalCacheFolder.Path}\\{AlbumSaveName}.jpg"
                                 }
                             }
                         },
@@ -885,7 +900,7 @@ namespace Live_Music
                                 },
                                 PeekImage = new TilePeekImage()
                                 {
-                                    Source = "Assets/NullAlbum.png"
+                                    Source = $"{ApplicationData.Current.LocalCacheFolder.Path}\\{AlbumSaveName}.jpg"
                                 }
                             }
                         },
@@ -918,7 +933,7 @@ namespace Live_Music
                                 },
                                 PeekImage = new TilePeekImage()
                                 {
-                                    Source = "Assets/NullAlbum.png"
+                                    Source = $"{ApplicationData.Current.LocalCacheFolder.Path}\\{AlbumSaveName}.jpg"
                                 }
                             }
                         },
@@ -949,7 +964,7 @@ namespace Live_Music
                                 },
                                 PeekImage = new TilePeekImage()
                                 {
-                                    Source = "Assets/NullAlbum.png"
+                                    Source = $"{ApplicationData.Current.LocalCacheFolder.Path}\\{AlbumSaveName}.jpg"
                                 }
                             }
                         }
