@@ -48,8 +48,31 @@ namespace Live_Music.Views
                     ChangeMusicPlayerVisibility(musicService.mediaPlayer.PlaybackSession.PlaybackState);
                     break;
             }
+            MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick;
+            //Frame.LostFocus += Frame_LostFocus;
+            //Frame.GotFocus += Frame_GotFocus;
+            //上面的有问题
+            progressBar.Maximum = musicInfomation.MusicDurationProperties;
         }
 
+        private void Frame_GotFocus(object sender, RoutedEventArgs e)
+        {
+            musicInfoGrid.Visibility = Visibility.Visible;
+            progressBar.Visibility = Visibility.Visible;
+            exitButton.Visibility = Visibility.Visible;
+        }
+
+        private void Frame_LostFocus(object sender, RoutedEventArgs e)
+        {
+            musicInfoGrid.Visibility = Visibility.Collapsed;
+            progressBar.Visibility = Visibility.Collapsed;
+            exitButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void DispatcherTimer_Tick(object sender, object e)
+        {
+            progressBar.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
+        }
 
 
         private void ExitCompactPageMode(object sender, RoutedEventArgs e)

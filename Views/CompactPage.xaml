@@ -37,7 +37,7 @@
 
             <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
 
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid x:Name="musicInfomationGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <Grid.Background>
                     <AcrylicBrush TintOpacity="0" TintColor="Gray"/>
                 </Grid.Background>
@@ -62,7 +62,7 @@
             </Grid>
         </Grid>
         
-        <Button Click="ExitCompactPageMode" Content="&#xE158;" FontSize="16" Style="{StaticResource ButtonFontIconStyle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,10"/>
-        <ProgressBar Value="50" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
+        <Button x:Name="exitButton" Click="ExitCompactPageMode" Content="&#xE158;" FontSize="16" Style="{StaticResource ButtonFontIconStyle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,10"/>
+        <ProgressBar CornerRadius="0" x:Name="progressBar" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
     </Grid>
 </Page>

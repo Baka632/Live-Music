@@ -92,8 +92,17 @@ namespace Live_Music
         /// 从文件读取的音乐属性
         /// </summary>
         MusicProperties musicProperties;
+        /// <summary>
+        /// 新的进度条值
+        /// </summary>
         public static double SliderNewValue;
+        /// <summary>
+        /// 指示鼠标指针是否在拖动进度条的值
+        /// </summary>
         public static bool IsPointerEntered = false;
+        /// <summary>
+        /// 用于保存专辑缩略图的文件名
+        /// </summary>
         string AlbumSaveName = "";
 
         /// <summary>
