@@ -172,7 +172,7 @@
             </Style>
         </ResourceDictionary>
     </Page.Resources>
-
+    
     <Grid x:Name="mainPageGrid">
         <Grid.RowDefinitions>
             <RowDefinition/>
