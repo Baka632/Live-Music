@@ -16,6 +16,12 @@ using Live_Music.Views;
 using Live_Music.Services;
 using Live_Music.Helpers;
 using Windows.Storage;
+using Windows.Storage.Search;
+using System.Collections.ObjectModel;
+using Windows.Storage.FileProperties;
+using System.Threading.Tasks;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -38,7 +44,9 @@ namespace Live_Music.Views
         /// 音乐服务的实例
         /// </summary>
         MusicService musicService = App.musicService;
-        
+        IReadOnlyList<StorageFile> fileList;
+        public ObservableCollection<string> musicTitleList = new ObservableCollection<string>();
+
         /// <summary>
         /// 初始化FrameContent类的新实例
         /// </summary>
@@ -72,6 +80,31 @@ namespace Live_Music.Views
         private void ShowPopup(object sender, RoutedEventArgs e)
         {
             MainPage.popup.IsOpen = true;
+        }
+
+        private async Task GetMusic()
+        {
+            StorageFolder musicFolder = KnownFolders.MusicLibrary;
+            fileList = await musicFolder.GetFilesAsync(CommonFileQuery.OrderByMusicProperties);
+            BitmapImage bitmapImage = new BitmapImage();
+            InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
+            foreach (StorageFile file in fileList)
+            {
+                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+                if (string.IsNullOrWhiteSpace(musicProperties.Title) != true && !musicTitleList.Contains(musicProperties.Album))
+                {
+                    musicTitleList.Add(musicProperties.Album);
+                }
+                else if(!musicTitleList.Contains("未知专辑"))
+                {
+                    musicTitleList.Add("未知专辑");
+                }
+            }
+        }
+
+        private async void GridView_Loaded(object sender, RoutedEventArgs e)
+        {
+            await GetMusic();
         }
     }
 }
