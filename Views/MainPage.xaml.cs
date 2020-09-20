@@ -104,6 +104,7 @@ namespace Live_Music
         /// 用于保存专辑缩略图的文件名
         /// </summary>
         string AlbumSaveName = "";
+        MediaItemDisplayProperties props;
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -398,10 +399,16 @@ namespace Live_Music
                 musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemIndex];
                 musicInfomation.MusicDurationProperties = MusicDurationList[CurrentItemIndex];
                 musicInfomation.MusicAlbumProperties = MusicAlbumList[CurrentItemIndex];
-                musicService.mediaPlaybackList.CurrentItem.GetDisplayProperties().MusicProperties.AlbumArtist = musicInfomation.MusicAlbumArtistProperties;
-                musicService.mediaPlaybackList.CurrentItem.GetDisplayProperties().MusicProperties.AlbumTitle = musicInfomation.MusicAlbumProperties;
-                musicService.mediaPlaybackList.CurrentItem.GetDisplayProperties().MusicProperties.Title = musicInfomation.MusicTitleProperties;
-                
+
+                StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.GetFileAsync($"{AlbumSaveName}.jpg");
+                props = mediaPlaybackItem.GetDisplayProperties();
+                props.Type = Windows.Media.MediaPlaybackType.Music;
+                props.MusicProperties.Title = musicInfomation.MusicTitleProperties;
+                props.MusicProperties.Artist = musicInfomation.MusicAlbumArtistProperties;
+                props.Thumbnail = RandomAccessStreamReference.CreateFromFile(storageFile);
+                props.MusicProperties.AlbumTitle = musicInfomation.MusicAlbumProperties;
+                mediaPlaybackItem.ApplyDisplayProperties(props);
+
                 SetTileSource();
 
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -588,14 +595,6 @@ namespace Live_Music
             await bitmapImage.SetSourceAsync(randomAccessStream);
             MusicImageList.Add(bitmapImage);
 
-            AlbumSaveName = musicProperties.Album;
-            AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
-
-            using (var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
-            {
-                await WindowsRuntimeStreamExtensions.AsStreamForRead(thumbnail.GetInputStreamAt(0)).CopyToAsync(fileStream);
-            }
-
             ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
             var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
 
@@ -616,6 +615,14 @@ namespace Live_Music
             if (musicService.mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.None || musicService.mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
             {
                 musicService.mediaPlayer.Play();
+            }
+
+            AlbumSaveName = musicProperties.Album;
+            AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
+
+            using (var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
+            {
+                await WindowsRuntimeStreamExtensions.AsStreamForRead(thumbnail.GetInputStreamAt(0)).CopyToAsync(fileStream);
             }
         }
 
