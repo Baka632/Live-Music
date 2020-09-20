@@ -53,24 +53,16 @@ namespace Live_Music.Views
         public FrameContect()
         {
             this.InitializeComponent();
+            if (localSettings.Values["IsLoadMusicOnStartUp"] != null)
+            {
+                IsLoadMusicToggleSwitch.IsOn = (bool)localSettings.Values["IsLoadMusicOnStartUp"];
+            }
+            else
+            {
+                IsLoadMusicToggleSwitch.IsOn = true;
+                localSettings.Values["IsLoadMusicOnStartUp"] = true;
+            }
         }
-
-        /// <summary>
-        /// 保存当前播放器的音量
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveVolume(object sender, RoutedEventArgs e)
-        {
-            localSettings.Values["MusicVolume"] = musicService.mediaPlayer.Volume;
-        }
-
-        /// <summary>
-        /// 抛出一个异常,这仅仅是为了测试
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LeadToException(object sender, RoutedEventArgs e) => throw new ArgumentException("Exception");
 
         /// <summary>
         /// 显示通知横幅
@@ -104,7 +96,27 @@ namespace Live_Music.Views
 
         private async void GridView_Loaded(object sender, RoutedEventArgs e)
         {
-            await GetMusic();
+            if ((bool)localSettings.Values["IsLoadMusicOnStartUp"])
+            {
+                await GetMusic();
+            }
+        }
+
+        private async void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            if (toggleSwitch != null)
+            {
+                if (toggleSwitch.IsOn == true)
+                {
+                    localSettings.Values["IsLoadMusicOnStartUp"] = true;
+                    await GetMusic();
+                }
+                else
+                {
+                    localSettings.Values["IsLoadMusicOnStartUp"] = false;
+                }
+            }
         }
     }
 }
