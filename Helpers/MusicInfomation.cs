@@ -120,6 +120,8 @@ namespace Live_Music.Helpers
             MusicImageProperties = null;
             MusicTitleProperties = "";
             MusicLenthProperties = "0:00";
+            MusicDurationProperties = 0;
+            MusicAlbumProperties = "";
         }
 
         /// <summary>

@@ -493,6 +493,9 @@ namespace Live_Music
             MusicArtistList.Clear();
             MusicImageList.Clear();
             MusicTitleList.Clear();
+            MusicLenthList.Clear();
+            MusicDurationList.Clear();
+            MusicAlbumList.Clear();
         }
 
         /// <summary>
