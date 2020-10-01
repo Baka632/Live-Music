@@ -240,6 +240,7 @@ namespace Live_Music.Views
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = PlayPauseButtonFontSize };
+                        MainPage.dispatcherTimer.Start();
                     });
                     break;
                 case MediaPlaybackState.Paused:
@@ -247,6 +248,12 @@ namespace Live_Music.Views
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = PlayPauseButtonFontSize };
+                        if (musicService.mediaPlaybackList.Items.Count == musicService.mediaPlaybackList.CurrentItemIndex + 1 && (int)processSlider.Value == (int)processSlider.Maximum)
+                        {
+                            MainPage.dispatcherTimer.Stop();
+                            musicNowPlayingTimeTextBlock.Text = "0:00";
+                            processSlider.Value = 0;
+                        }
                     });
                     break;
                 default:

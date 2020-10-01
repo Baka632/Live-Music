@@ -57,6 +57,21 @@ namespace Live_Music
             MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased; //内存增加到上限值时的操作
 
             FocusVisualKind = FocusVisualKind.Reveal;
+
+            string ThemeSettings = (string)localSettings.Values["ThemeSetting"];
+            switch (ThemeSettings)
+            {
+                case "Light":
+                    Current.RequestedTheme = ApplicationTheme.Light;
+                    break;
+                case "Dark":
+                    Current.RequestedTheme = ApplicationTheme.Dark;
+                    break;
+                case "Default":
+                    break;
+                case null:
+                    break;
+            }
         }
 
         /// <summary>
@@ -311,20 +326,6 @@ namespace Live_Music
             SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
             Frame rootFrame = Window.Current.Content as Frame;
             Window.Current.Content = rootFrame;
-            string ThemeSettings = (string)localSettings.Values["ThemeSetting"];
-            switch (ThemeSettings)
-            {
-                case "Light":
-                    //Current.RequestedTheme = ApplicationTheme.Light;
-                    break;
-                case "Dark":
-                    Current.RequestedTheme = ApplicationTheme.Dark;
-                    break;
-                case "Default":
-                    break;
-                case null:
-                    break;
-            }
 
             //当系统收到回退请求(BackRequested)的时候，就会调用方法OnBackRequested来处理该事件
             SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;

@@ -35,7 +35,7 @@
             <Button Content="Popup" Click="ShowPopup" Margin="0,10,0,10"/>
         </StackPanel>-->
         
-        <GridView Loaded="GridView_Loaded" ItemsSource="{x:Bind musicTitleList,Mode=OneWay}" Grid.Row="1" Margin="11,0,0,0">
+        <GridView ItemsSource="{x:Bind musicTitleList,Mode=OneWay}" Grid.Row="1" Margin="11,0,0,0">
             <GridViewItem>
                 <DataTemplate x:DataType="local:FrameContect">
                     <StackPanel Margin="5">

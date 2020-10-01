@@ -36,6 +36,7 @@ using Windows.UI.ViewManagement;
 using Windows.ApplicationModel.Core;
 using Windows.Devices.Custom;
 using Live_Music.Views;
+using LiveStudioSharedUWP.LiveStudioCollections;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 //使用了Win2D,Microsoft Toolkit和Windows UI
@@ -199,6 +200,10 @@ namespace Live_Music
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
             processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
+            if (musicService.mediaPlaybackList.CurrentItem == null)
+            {
+                musicInfomationButton.Visibility = Visibility.Collapsed;
+            }
         }
 
         /// <summary>
@@ -357,6 +362,10 @@ namespace Live_Music
                     {
                         pausePlayingButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = 27 };
                         NowPlayingProperties = "暂停";
+                        if (dispatcherTimer.IsEnabled == false)
+                        {
+                            dispatcherTimer.Start();
+                        }
                     });
                     break;
                 case MediaPlaybackState.Paused:
@@ -364,6 +373,12 @@ namespace Live_Music
                     {
                         pausePlayingButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = 27 };
                         NowPlayingProperties = "播放";
+                        if (musicService.mediaPlaybackList.Items.Count == musicService.mediaPlaybackList.CurrentItemIndex + 1 && (int)processSlider.Value == (int)processSlider.Maximum)
+                        {
+                            dispatcherTimer.Stop();
+                            musicNowPlayingTimeTextBlock.Text = "0:00";
+                            processSlider.Value = 0;
+                        }
                     });
                     break;
                 default:
@@ -413,6 +428,7 @@ namespace Live_Music
 
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
+                    musicInfomationButton.Visibility = Visibility.Visible;
                     processSlider.Maximum = musicInfomation.MusicDurationProperties;
                     processSlider.IsEnabled = true;
                     processSlider.Value = 0;
@@ -425,6 +441,7 @@ namespace Live_Music
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     dispatcherTimer.Stop();
+                    musicInfomationButton.Visibility = Visibility.Collapsed;
                 });
                 tileHelper.DeleteTile();
             }

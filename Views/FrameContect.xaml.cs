@@ -22,6 +22,8 @@ using Windows.Storage.FileProperties;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
+using Windows.UI.Core;
+using LiveStudioSharedUWP.LiveStudioCollections;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -59,8 +61,13 @@ namespace Live_Music.Views
             }
             else
             {
-                IsLoadMusicToggleSwitch.IsOn = true;
-                localSettings.Values["IsLoadMusicOnStartUp"] = true;
+                IsLoadMusicToggleSwitch.IsOn = false;
+                localSettings.Values["IsLoadMusicOnStartUp"] = false;
+            }
+
+            if ((bool)localSettings.Values["IsLoadMusicOnStartUp"])
+            {
+                Task getMusicFile = Task.Run(() => GetMusic());
             }
         }
 
@@ -74,43 +81,37 @@ namespace Live_Music.Views
             MainPage.popup.IsOpen = true;
         }
 
-        private async Task GetMusic()
+        private async void GetMusic()
         {
-            StorageFolder musicFolder = KnownFolders.MusicLibrary;
-            fileList = await musicFolder.GetFilesAsync(CommonFileQuery.OrderByMusicProperties);
-            BitmapImage bitmapImage = new BitmapImage();
-            InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
-            foreach (StorageFile file in fileList)
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                if (string.IsNullOrWhiteSpace(musicProperties.Title) != true && !musicTitleList.Contains(musicProperties.Album))
+                StorageFolder musicFolder = KnownFolders.MusicLibrary;
+                fileList = await musicFolder.GetFilesAsync(CommonFileQuery.OrderByMusicProperties);
+                BitmapImage bitmapImage = new BitmapImage();
+                InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
+                foreach (StorageFile file in fileList)
                 {
-                    musicTitleList.Add(musicProperties.Album);
+                    MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+                    if (string.IsNullOrWhiteSpace(musicProperties.Title) != true && !musicTitleList.Contains(musicProperties.Album))
+                    {
+                        musicTitleList.Add(musicProperties.Album);
+                    }
+                    else if (!musicTitleList.Contains("未知专辑"))
+                    {
+                        musicTitleList.Add("未知专辑");
+                    }
                 }
-                else if(!musicTitleList.Contains("未知专辑"))
-                {
-                    musicTitleList.Add("未知专辑");
-                }
-            }
+            });
         }
 
-        private async void GridView_Loaded(object sender, RoutedEventArgs e)
+        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-            if ((bool)localSettings.Values["IsLoadMusicOnStartUp"])
-            {
-                await GetMusic();
-            }
-        }
-
-        private async void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
+            if (sender is ToggleSwitch toggleSwitch)
             {
                 if (toggleSwitch.IsOn == true)
                 {
                     localSettings.Values["IsLoadMusicOnStartUp"] = true;
-                    await GetMusic();
+                    Task getMusicFile = Task.Run(() => GetMusic());
                 }
                 else
                 {

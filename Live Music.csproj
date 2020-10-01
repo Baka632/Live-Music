@@ -141,7 +141,7 @@
     <Compile Include="Views\End.xaml.cs">
       <DependentUpon>End.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\FolderList.cs" />
+    <Compile Include="Helpers\MusicFileList.cs" />
     <Compile Include="Views\FrameContect.xaml.cs">
       <DependentUpon>FrameContect.xaml</DependentUpon>
     </Compile>
@@ -297,7 +297,12 @@
       <Version>1.25.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\LiveStudioSharedUWP\LiveStudioSharedUWP.csproj">
+      <Project>{4c3233af-40f9-4fbe-a13c-3104f808b293}</Project>
+      <Name>LiveStudioSharedUWP</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
