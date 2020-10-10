@@ -35,7 +35,7 @@
                 />
             </Grid.Background>
 
-            <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
+            <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0.5" Stretch="UniformToFill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
 
             <Grid x:Name="musicInfomationGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <Grid.Background>

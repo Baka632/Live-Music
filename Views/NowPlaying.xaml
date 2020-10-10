@@ -201,7 +201,7 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" Grid.Row="0">
-                        <Image Stretch="Fill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}" Width="100" Height="100"/>
+                        <Image Stretch="Fill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}" Width="Auto" Height="100"/>
                         <StackPanel Margin="10,0,0,11" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontWeight="Bold" FontSize="25"/>
                             <TextBlock Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontSize="20" FontWeight="SemiLight"/>
