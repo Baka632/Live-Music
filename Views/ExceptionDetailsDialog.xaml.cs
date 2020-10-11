@@ -39,7 +39,16 @@ namespace Live_Music.ExceptionDetails
             await UniversallyEmail(
                 "livestudiohelp@outlook.com",
                 $"Live Music异常跟踪",
-                $"===请在这里描述你做了什么===\n\n\n===不要更改以下内容!===\n异常名称:{App.UnhandledExceptionMessage[0]}\n详细信息:{App.UnhandledExceptionMessage[1]} \n应用版本 {appVersion} \n系统版本{Environment.OSVersion}\n是否出现三次以上:{App.IsExceptionHappenedOverThree}\n===这是异常报告的末尾===");
+                $@"===请在这里描述你做了什么===
+
+===不要更改以下内容!===
+异常名称:{App.UnhandledExceptionMessage[0]}
+详细信息:{App.UnhandledExceptionMessage[1]} 
+堆栈跟踪:{App.UnhandledExceptionMessage[2]}
+应用版本:{appVersion} 
+系统版本:{Environment.OSVersion}
+是否出现三次以上:{App.IsExceptionHappenedOverThree}
+===这是异常报告的末尾===");
         }
 
         private async Task UniversallyEmail(string email, string subject, string messageBody)

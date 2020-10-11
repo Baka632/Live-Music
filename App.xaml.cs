@@ -30,6 +30,7 @@ using Live_Music.Helpers;
 using Live_Music.Services;
 using Windows.UI.Core.Preview;
 using Windows.UI.Core;
+using System.Text;
 
 namespace Live_Music
 {
@@ -95,7 +96,7 @@ namespace Live_Music
         /// <summary>
         /// 异常的详细信息
         /// </summary>
-        public static string[] UnhandledExceptionMessage = {"FullName","Message"};
+        public static string[] UnhandledExceptionMessage = {"FullName","Message","StackTrace"};
         /// <summary>
         /// 此值指示未处理的异常是否出现了三次
         /// </summary>
@@ -115,7 +116,16 @@ namespace Live_Music
             e.Handled = true;
             UnhandledExceptionCount++;
             UnhandledExceptionMessage[0] = e.Exception.GetType().FullName;
-            UnhandledExceptionMessage[1] = e.Message;
+            UnhandledExceptionMessage[1] = e.Exception.ToString();
+            var stackFrames = new StackTrace(e.Exception).GetFrames() ?? new StackFrame[0];
+            var frames = stackFrames.Select(x => x.GetMethod()).Select(m =>
+        $"{m.DeclaringType?.FullName ?? "null"}.{m.Name}({string.Join(", ", m.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})");
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string text in frames.ToList())
+            {
+                stringBuilder.Append(text);
+            }
+            UnhandledExceptionMessage[2] = string.IsNullOrWhiteSpace(stringBuilder.ToString()) == true ? "null" : stringBuilder.ToString();
             ExceptionDetails.ExceptionDetailsDialog exceptionDetailsDialog = new ExceptionDetails.ExceptionDetailsDialog();
             TextBlock textBlock = new TextBlock();
 

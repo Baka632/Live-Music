@@ -67,7 +67,10 @@ namespace Live_Music.Views
 
             if ((bool)localSettings.Values["IsLoadMusicOnStartUp"])
             {
-                Task getMusicFile = Task.Run(() => GetMusic());
+                Task getMusicFile = Task.Run(() =>
+                {
+                    GetMusic();
+                });
             }
         }
 
