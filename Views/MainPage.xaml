@@ -413,6 +413,6 @@
             </Popup.ChildTransitions>
         </Popup>
         
-        <TextBlock x:Name="titleTextBlock" Text="LIve Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
+        <TextBlock x:Name="titleTextBlock" Text="Live Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
     </Grid>
 </Page>
