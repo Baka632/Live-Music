@@ -293,7 +293,7 @@
 
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Height="35" Width="35" x:Name="muteButton" Content="&#xE995;" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
+                <Button Height="35" Width="35" x:Name="muteButton" Content="{x:Bind volumeGlyphState.VolumeGlyph,Mode=OneWay}" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
 
                 <Slider x:Name="volumeSlider" Width="100" ValueChanged="VolumeChanged"  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
 

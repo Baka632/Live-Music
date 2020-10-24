@@ -14,7 +14,7 @@ namespace Live_Music.Services
     /// <summary>
     /// 为音乐播放及音乐播放列表提供类和方法
     /// </summary>
-    public class MusicService
+    public class MusicService : IDisposable
     {
         /// <summary>
         /// 音乐播放器的实例
@@ -32,6 +32,7 @@ namespace Live_Music.Services
         /// 指示是否要使用保存的音量设置的值
         /// </summary>
         bool IsSetStoredVolume = true;
+        private bool disposedValue;
 
         /// <summary>
         /// 初始化MusicService类的新实例
@@ -42,18 +43,45 @@ namespace Live_Music.Services
             mediaPlayer.Volume = App.musicInfomation.MusicVolumeProperties;
         }
 
+        #region DisposeMusicService
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: 释放托管状态(托管对象)
+                    mediaPlayer.Dispose();
+                    mediaPlaybackList.Items.Clear();
+
+                    mediaPlayer = null;
+                    mediaPlaybackList = null;
+                }
+
+                // TODO: 释放未托管的资源(未托管的对象)并替代终结器
+                // TODO: 将大型字段设置为 null
+                disposedValue = true;
+                Debug.WriteLine("已清理音乐服务的资源。");
+            }
+        }
+
+        // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
+        ~MusicService()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: false);
+        }
+
         /// <summary>
         /// 清理音乐服务的所有资源,如果使用这个方法,则必须重新实例化这个类
         /// </summary>
-        public void DisposeMusicService()
+        public void Dispose()
         {
-            mediaPlayer.Dispose();
-            mediaPlaybackList.Items.Clear();
-
-            mediaPlayer = null;
-            mediaPlaybackList = null;
-            Debug.WriteLine("已清理音乐服务的资源。");
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
+        #endregion
 
         /// <summary>
         /// 终止音乐播放

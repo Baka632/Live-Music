@@ -31,6 +31,8 @@ using Live_Music.Services;
 using Windows.UI.Core.Preview;
 using Windows.UI.Core;
 using System.Text;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Live_Music
 {
@@ -83,6 +85,7 @@ namespace Live_Music
         /// 音乐服务的实例
         /// </summary>
         public static MusicService musicService = new MusicService();
+        public static VolumeGlyphState volumeGlyphState = new VolumeGlyphState();
 
         /// <summary>
         /// 访问本地设置的实例
@@ -232,7 +235,7 @@ namespace Live_Music
                 Debug.WriteLine("正在卸载主页面内容");
                 Window.Current.Content = null;
                 Debug.WriteLine("正在清理音乐及其信息服务的资源...");
-                musicService.DisposeMusicService();
+                musicService.Dispose();
                 musicInfomation.ResetAllMusicProperties();
                 Debug.WriteLine("完成。");
             }

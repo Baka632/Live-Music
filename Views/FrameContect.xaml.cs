@@ -95,7 +95,7 @@ namespace Live_Music.Views
                 foreach (StorageFile file in fileList)
                 {
                     MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                    if (string.IsNullOrWhiteSpace(musicProperties.Title) != true && !musicTitleList.Contains(musicProperties.Album))
+                    if (!musicTitleList.Contains(musicProperties.Album)&& string.IsNullOrWhiteSpace(musicProperties.Title) != true)
                     {
                         musicTitleList.Add(musicProperties.Album);
                     }

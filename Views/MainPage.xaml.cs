@@ -58,14 +58,6 @@ namespace Live_Music
         /// </summary>
         TileHelper tileHelper = new TileHelper();
         /// <summary>
-        /// FontIcon的实例
-        /// </summary>
-        FontIcon fontIcon = new FontIcon();
-        /// <summary>
-        /// FontFamily的实例
-        /// </summary>
-        FontFamily fontFamily = new FontFamily("Segoe MDL2 Assets");
-        /// <summary>
         /// 音乐信息的实例
         /// </summary>
         MusicInfomation musicInfomation = App.musicInfomation;
@@ -106,6 +98,7 @@ namespace Live_Music
         /// </summary>
         string AlbumSaveName = "";
         MediaItemDisplayProperties props;
+        VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -171,7 +164,6 @@ namespace Live_Music
             stopPlayingButton.IsEnabled = false;
 
             popup = panePopup;
-            fontIcon.FontFamily = fontFamily;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
@@ -193,7 +185,7 @@ namespace Live_Music
 
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
-            ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
+            //volumeGlyphState.ChangeVolumeGlyph();
             processSlider.IsEnabled = false;
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -204,6 +196,7 @@ namespace Live_Music
             {
                 musicInfomationButton.Visibility = Visibility.Collapsed;
             }
+            ChangeNavgationViewSelectItem();
         }
 
         /// <summary>
@@ -264,13 +257,10 @@ namespace Live_Music
             if (musicService.mediaPlayer.IsMuted == false)
             {
                 musicService.mediaPlayer.IsMuted = true;
-                fontIcon.Glyph = "\uE198";
-                muteButton.Content = fontIcon;
             }
             else
             {
                 musicService.mediaPlayer.IsMuted = false;
-                ChangeVolumeButtonGlyph(musicService.mediaPlayer.Volume);
             }
         }
 
@@ -727,43 +717,9 @@ namespace Live_Music
         private void VolumeChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             musicInfomation.MusicVolumeProperties = e.NewValue / 100;
-
-            ChangeVolumeButtonGlyph(musicService.mediaPlayer.Volume);
             if (musicService.mediaPlayer.IsMuted == true)
             {
                 musicService.mediaPlayer.IsMuted = false;
-            }
-        }
-
-        /// <summary>
-        /// 改变音量按钮的显示图标
-        /// </summary>
-        /// <param name="MediaPlayerVolume"></param>
-        private void ChangeVolumeButtonGlyph(double MediaPlayerVolume)
-        {
-            if (MediaPlayerVolume > 0.6 && muteButton != null)
-            {
-                fontIcon.Glyph = "\uE995";
-                fontIcon.FontSize = 17;
-                muteButton.Content = fontIcon;
-            }
-            else if (MediaPlayerVolume > 0.3 && MediaPlayerVolume < 0.6)
-            {
-                fontIcon.Glyph = "\uE994";
-                fontIcon.FontSize = 17;
-                muteButton.Content = fontIcon;
-            }
-            else if (MediaPlayerVolume > 0 && MediaPlayerVolume < 0.3)
-            {
-                fontIcon.Glyph = "\uE993";
-                fontIcon.FontSize = 17;
-                muteButton.Content = fontIcon;
-            }
-            else if (MediaPlayerVolume == 0)
-            {
-                fontIcon.Glyph = "\uE992";
-                fontIcon.FontSize = 17;
-                muteButton.Content = fontIcon;
             }
         }
 
@@ -1018,9 +974,9 @@ namespace Live_Music
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter is StorageFile && e.Parameter != null)
+            if (e.Parameter is StorageFile file && e.Parameter != null)
             {
-                OpenMusicFile((StorageFile)e.Parameter);
+                OpenMusicFile(file);
             }
             else if (IsEnteringNowPlaying == true)
             {
