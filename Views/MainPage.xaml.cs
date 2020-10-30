@@ -128,31 +128,31 @@ namespace Live_Music
         /// <summary>
         /// 音乐艺术家的列表
         /// </summary>
-        ObservableCollection<string> MusicArtistList;
+        Dictionary<int,string> MusicArtistList = new Dictionary<int, string>();
         /// <summary>
         /// 音乐标题的列表
         /// </summary>
-        ObservableCollection<string> MusicTitleList;
+        Dictionary<int, string> MusicTitleList = new Dictionary<int, string>();
         /// <summary>
         /// 音乐缩略图的列表
         /// </summary>
-        ObservableCollection<BitmapImage> MusicImageList;
+        Dictionary<int,BitmapImage> MusicImageList = new Dictionary<int, BitmapImage>();
         /// <summary>
         /// 音乐缩略图主题色的列表
         /// </summary>
-        ObservableCollection<Color> MusicGirdColorsList;
+        Dictionary<int,Color> MusicGirdColorsList = new Dictionary<int, Color>();
         /// <summary>
         /// 音乐长度的列表
         /// </summary>
-        ObservableCollection<string> MusicLenthList;
+        Dictionary<int,string> MusicLenthList = new Dictionary<int, string>();
         /// <summary>
         /// 音乐实际长度的列表(未被转换为string)
         /// </summary>
-        ObservableCollection<double> MusicDurationList;
+        Dictionary<int,double> MusicDurationList = new Dictionary<int, double>();
         /// <summary>
         /// 音乐专辑名称的列表
         /// </summary>
-        ObservableCollection<string> MusicAlbumList;
+        Dictionary<int, string> MusicAlbumList = new Dictionary<int, string>();
 
         /// <summary>
         /// 初始化MainPage类的新实例
@@ -174,14 +174,6 @@ namespace Live_Music
             musicProcessStackPanel.Visibility = Visibility.Collapsed;
 
             NavigationCacheMode = NavigationCacheMode.Required;
-
-            MusicArtistList = musicInfomation.MusicArtistList;
-            MusicTitleList = musicInfomation.MusicTitleList;
-            MusicImageList = musicInfomation.MusicImageList;
-            MusicGirdColorsList = musicInfomation.MusicGirdColorsList;
-            MusicLenthList = musicInfomation.MusicLenthList;
-            MusicAlbumList = musicInfomation.MusicAlbumList;
-            MusicDurationList = musicInfomation.MusicDurationList;
 
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
@@ -395,15 +387,15 @@ namespace Live_Music
         {
             if (musicService.mediaPlaybackList.CurrentItem != null)
             {
-                int CurrentItemIndex = (int)musicService.mediaPlaybackList.CurrentItemIndex;
+                int CurrentItemHashCode = musicService.mediaPlaybackList.CurrentItem.GetHashCode();
 
-                musicInfomation.MusicAlbumArtistProperties = MusicArtistList[CurrentItemIndex];
-                musicInfomation.MusicTitleProperties = MusicTitleList[CurrentItemIndex];
-                musicInfomation.MusicImageProperties = MusicImageList[CurrentItemIndex];
-                musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemIndex];
-                musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemIndex];
-                musicInfomation.MusicDurationProperties = MusicDurationList[CurrentItemIndex];
-                musicInfomation.MusicAlbumProperties = MusicAlbumList[CurrentItemIndex];
+                musicInfomation.MusicAlbumArtistProperties = MusicArtistList[CurrentItemHashCode];
+                musicInfomation.MusicTitleProperties = MusicTitleList[CurrentItemHashCode];
+                musicInfomation.MusicImageProperties = MusicImageList[CurrentItemHashCode];
+                musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemHashCode];
+                musicInfomation.MusicLenthProperties = MusicLenthList[CurrentItemHashCode];
+                musicInfomation.MusicDurationProperties = MusicDurationList[CurrentItemHashCode];
+                musicInfomation.MusicAlbumProperties = MusicAlbumList[CurrentItemHashCode];
 
                 StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.GetFileAsync($"{AlbumSaveName}.jpg");
                 props = mediaPlaybackItem.GetDisplayProperties();
@@ -568,53 +560,56 @@ namespace Live_Music
         /// <param name="file">传入的音乐文件</param>
         private async void PlayAndGetMusicProperites(StorageFile file)
         {
+            mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
+            musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
+
             BitmapImage bitmapImage = new BitmapImage();
             InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
+
+            int mediaPlayBackItemHashCode = mediaPlaybackItem.GetHashCode();
 
             musicProperties = await file.Properties.GetMusicPropertiesAsync();
             if (string.IsNullOrWhiteSpace(musicProperties.Artist) != true)
             {
-                MusicArtistList.Add(musicProperties.AlbumArtist);
+                MusicArtistList.Add(mediaPlayBackItemHashCode, musicProperties.AlbumArtist);
             }
             else
             {
-                MusicArtistList.Add("未知艺术家");
+                MusicArtistList.Add(mediaPlayBackItemHashCode, "未知艺术家");
             }
 
             if (string.IsNullOrWhiteSpace(musicProperties.Title) != true)
             {
-                MusicTitleList.Add(musicProperties.Title);
+                MusicTitleList.Add(mediaPlayBackItemHashCode, musicProperties.Title);
             }
             else
             {
-                MusicTitleList.Add(file.Name);
+                MusicTitleList.Add(mediaPlayBackItemHashCode, file.Name);
             }
 
             if (string.IsNullOrWhiteSpace(musicProperties.Album) != true)
             {
-                MusicAlbumList.Add(musicProperties.Album);
+                MusicAlbumList.Add(mediaPlayBackItemHashCode, musicProperties.Album);
             }
             else
             {
-                MusicAlbumList.Add("未知专辑");
+                MusicAlbumList.Add(mediaPlayBackItemHashCode, "未知专辑");
             }
 
             var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem);
             await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
             randomAccessStream.Seek(0);
             await bitmapImage.SetSourceAsync(randomAccessStream);
-            MusicImageList.Add(bitmapImage);
+            MusicImageList.Add(mediaPlayBackItemHashCode,bitmapImage);
 
             ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
             var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
 
-            MusicGirdColorsList.Add(color);
+            MusicGirdColorsList.Add(mediaPlayBackItemHashCode, color);
 
-            MusicLenthList.Add(musicProperties.Duration.ToString(@"m\:ss"));
-            MusicDurationList.Add(musicProperties.Duration.TotalSeconds);
+            MusicLenthList.Add(mediaPlayBackItemHashCode, musicProperties.Duration.ToString(@"m\:ss"));
+            MusicDurationList.Add(mediaPlayBackItemHashCode, musicProperties.Duration.TotalSeconds);
 
-            mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
-            musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
             if (IsFirstTimeAddMusic == true)
             {
                 musicService.mediaPlayer.Source = musicService.mediaPlaybackList;

@@ -63,35 +63,6 @@ namespace Live_Music.Helpers
         Color MusicNowPlayingGridAcrylicBrushColor = (Color)Application.Current.Resources["SystemAccentColorDark2"];
 
         /// <summary>
-        /// 音乐艺术家的列表
-        /// </summary>
-        public ObservableCollection<string> MusicArtistList = new ObservableCollection<string>();
-        /// <summary>
-        /// 音乐标题的列表
-        /// </summary>
-        public ObservableCollection<string> MusicTitleList = new ObservableCollection<string>();
-        /// <summary>
-        /// 音乐缩略图的列表
-        /// </summary>
-        public ObservableCollection<BitmapImage> MusicImageList = new ObservableCollection<BitmapImage>();
-        /// <summary>
-        /// 音乐缩略图主题色的列表
-        /// </summary>
-        public ObservableCollection<Color> MusicGirdColorsList = new ObservableCollection<Color>();
-        /// <summary>
-        /// 音乐长度的列表
-        /// </summary>
-        public ObservableCollection<string> MusicLenthList = new ObservableCollection<string>();
-        /// <summary>
-        /// 音乐实际长度的列表(未被转换为string)
-        /// </summary>
-        public ObservableCollection<double> MusicDurationList = new ObservableCollection<double>();
-        /// <summary>
-        /// 音乐专辑名称的列表
-        /// </summary>
-        public ObservableCollection<string> MusicAlbumList = new ObservableCollection<string>();
-
-        /// <summary>
         /// 初始化MusicInfomation的新实例
         /// </summary>
         public MusicInfomation()
