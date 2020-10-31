@@ -36,10 +36,6 @@ namespace Live_Music.Views
         /// </summary>
         MusicService musicService = App.musicService;
         /// <summary>
-        /// fontIcon的实例
-        /// </summary>
-        FontIcon fontIcon = new FontIcon();
-        /// <summary>
         /// 页面上按钮中的FontIcon字号的大小,该字段为常量
         /// </summary>
         private const int PlayPauseButtonFontSize = 20;
@@ -47,6 +43,7 @@ namespace Live_Music.Views
         /// 指示是否第一次进入页面
         /// </summary>
         bool IsFirstTimeEnterPage = true;
+        VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
 
         /// <summary>
         /// 初始化NowPlaying类的新实例
@@ -69,9 +66,7 @@ namespace Live_Music.Views
                     break;
             }
             volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
-            muteButton.Loaded += MuteButton_Loaded;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
-            ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
             MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick;
             processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个方法处理*/, true /*如果在之前处理，是否还使用函数*/);
             processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个方法处理*/, true /*如果在之前处理，是否还使用函数*/);
@@ -127,65 +122,6 @@ namespace Live_Music.Views
         }
 
         /// <summary>
-        /// 当MuteButton被加载时调用的方法
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MuteButton_Loaded(object sender, RoutedEventArgs e)
-        {
-            ChangeVolumeButtonGlyph(musicInfomation.MusicVolumeProperties);
-        }
-
-        /// <summary>
-        /// 改变音量按钮的显示图标
-        /// </summary>
-        /// <param name="MediaPlayerVolume"></param>
-        private void ChangeVolumeButtonGlyph(double MediaPlayerVolume)
-        {
-            if (MediaPlayerVolume > 0.6 && muteButton != null)
-            {
-                fontIcon.Glyph = "\uE995";
-                fontIcon.FontSize = PlayPauseButtonFontSize;
-                volumeButton.Content = fontIcon;
-                if (muteButton.IsLoaded == true)
-                {
-                    muteButton.Content = "\uE995";
-                }
-            }
-            else if (MediaPlayerVolume > 0.3 && MediaPlayerVolume < 0.6)
-            {
-                fontIcon.Glyph = "\uE994";
-                fontIcon.FontSize = PlayPauseButtonFontSize;
-                volumeButton.Content = fontIcon;
-                if (muteButton.IsLoaded == true)
-                {
-                    muteButton.Content = "\uE994";
-                }
-            }
-            else if (MediaPlayerVolume > 0 && MediaPlayerVolume < 0.3)
-            {
-                fontIcon.Glyph = "\uE993";
-                fontIcon.FontSize = PlayPauseButtonFontSize;
-                volumeButton.Content = fontIcon;
-                if (muteButton.IsLoaded == true)
-                {
-                    muteButton.Content = "\uE993";
-                }
-            }
-            else if (MediaPlayerVolume == 0)
-            {
-                fontIcon.Glyph = "\uE992";
-                fontIcon.FontSize = PlayPauseButtonFontSize;
-                volumeButton.Content = fontIcon;
-                if (muteButton.IsLoaded == true)
-                {
-                    fontIcon.FontSize = 16;
-                    muteButton.Content = "\uE992";
-                }
-            }
-        }
-
-        /// <summary>
         /// 改变播放器的静音状态
         /// </summary>
         /// <param name="sender"></param>
@@ -195,8 +131,6 @@ namespace Live_Music.Views
             if (musicService.mediaPlayer.IsMuted == false)
             {
                 musicService.mediaPlayer.IsMuted = true;
-                fontIcon.Glyph = "\uE198";
-                volumeButton.Content = fontIcon;
                 if (muteButton.IsLoaded == true)
                 {
                     muteButton.Content = "\uE198";
@@ -205,7 +139,6 @@ namespace Live_Music.Views
             else
             {
                 musicService.mediaPlayer.IsMuted = false;
-                ChangeVolumeButtonGlyph(musicService.mediaPlayer.Volume);
             }
         }
 
@@ -340,7 +273,6 @@ namespace Live_Music.Views
         {
             musicInfomation.MusicVolumeProperties = e.NewValue / 100;
 
-            ChangeVolumeButtonGlyph(musicService.mediaPlayer.Volume);
             if (musicService.mediaPlayer.IsMuted == true)
             {
                 musicService.mediaPlayer.IsMuted = false;

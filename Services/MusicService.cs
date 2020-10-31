@@ -28,10 +28,6 @@ namespace Live_Music.Services
         /// 访问本地设置的实例
         /// </summary>
         ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-        /// <summary>
-        /// 指示是否要使用保存的音量设置的值
-        /// </summary>
-        bool IsSetStoredVolume = true;
         private bool disposedValue;
 
         /// <summary>
@@ -98,16 +94,7 @@ namespace Live_Music.Services
         /// <param name="Volume">将要设置的音量大小,其值范围应在0和1之间,其余值将受到限制</param>
         public void SetMusicPlayerVolume(double Volume)
         {
-            if (IsSetStoredVolume == true)
-            {
-                IsSetStoredVolume = false;
-                mediaPlayer.Volume = (double)localSettings.Values["MusicVolume"];
-                App.musicInfomation.MusicVolumeProperties = (double)localSettings.Values["MusicVolume"];
-            }
-            else
-            {
-                mediaPlayer.Volume = Volume;
-            }
+            mediaPlayer.Volume = Volume;
         }
 
         /// <summary>

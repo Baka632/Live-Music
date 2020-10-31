@@ -97,6 +97,7 @@ namespace Live_Music
         /// 用于保存专辑缩略图的文件名
         /// </summary>
         string AlbumSaveName = "";
+        double VolumeInSlider;
         MediaItemDisplayProperties props;
         VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
 
@@ -164,20 +165,18 @@ namespace Live_Music
             stopPlayingButton.IsEnabled = false;
 
             popup = panePopup;
+            VolumeInSlider = musicInfomation.MusicVolumeProperties;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
             musicService.mediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
-
             mediaControlStackPanel.Visibility = Visibility.Collapsed;
             musicProcessStackPanel.Visibility = Visibility.Collapsed;
 
             NavigationCacheMode = NavigationCacheMode.Required;
 
-            volumeSlider.Value = musicInfomation.MusicVolumeProperties * 100;
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
-            //volumeGlyphState.ChangeVolumeGlyph();
             processSlider.IsEnabled = false;
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -504,11 +503,14 @@ namespace Live_Music
         /// <param name="args"></param>
         private async void MediaPlayer_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
-            ExceptionDetails.ExceptionDetailsDialog exceptionDetailsDialog = new ExceptionDetails.ExceptionDetailsDialog();
-            TextBlock textBlock = new TextBlock();
-            exceptionDetailsDialog.Title = "无法播放音乐";
-            exceptionDetailsDialog.Content = textBlock.Text = "这可能是因为文件已损坏,或者音乐文件的格式不受本应用支持。";
-            await exceptionDetailsDialog.ShowAsync();
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,async () =>
+            {
+                ExceptionDetails.ExceptionDetailsDialog exceptionDetailsDialog = new ExceptionDetails.ExceptionDetailsDialog();
+                TextBlock textBlock = new TextBlock();
+                exceptionDetailsDialog.Title = "无法播放音乐";
+                exceptionDetailsDialog.Content = textBlock.Text = "这可能是因为文件已损坏,或者音乐文件的格式不受本应用支持。";
+                await exceptionDetailsDialog.ShowAsync();
+            });
         }
 
         /// <summary>

@@ -24,15 +24,11 @@ namespace Live_Music.Helpers
         /// 访问本地设置的实例
         /// </summary>
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        /// <summary>
-        /// 指示音量设置是否由用户控制的值
-        /// </summary>
-        public bool IsUserMode = false;
 
         /// <summary>
         /// 播放器音量,默认值为1
         /// </summary>
-        double MusicVolume = 1;
+        double MusicVolume = (double)(ApplicationData.Current.LocalSettings.Values["MusicVolume"] ?? 1);
         /// <summary>
         /// 专辑艺术家,默认值为空("")
         /// </summary>
@@ -100,31 +96,21 @@ namespace Live_Music.Helpers
         /// </summary>
         public double MusicVolumeProperties
         {
-            get 
-            {
-                if (localSettings.Values["MusicVolume"] != null && IsUserMode == false)
-                {
-                    IsUserMode = true;
-                    MusicVolume = (double)localSettings.Values["MusicVolume"];
-                    return (double)localSettings.Values["MusicVolume"];
-                }
-                else
-                {
-                    return MusicVolume;
-                }
-            }
+            get => MusicVolume;
             set
             {
-                if (IsUserMode == false)
-                {
-                    IsUserMode = true;
-                    MusicVolume = (double)localSettings.Values["MusicVolume"];
-                }
-                else
-                {
-                    MusicVolume = value;
-                }
+                MusicVolume = value;
+                VolumeInSliderProperties = value * 100;
                 App.musicService.SetMusicPlayerVolume(MusicVolume);
+                OnPropertiesChanged();
+            }
+        }
+
+        public double VolumeInSliderProperties
+        {
+            get => MusicVolumeProperties * 100;
+            set
+            {
                 OnPropertiesChanged();
             }
         }

@@ -20,7 +20,21 @@ namespace Live_Music.Helpers
         private readonly FontIcon Volume1Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE993", FontSize = 16 };
         private readonly FontIcon Volume2Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE994", FontSize = 16 };
         private readonly FontIcon Volume3Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE995", FontSize = 16 };
+
+        private readonly FontIcon NowPlayingMuteIcon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE198",FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume0Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE992", FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume1Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE993", FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume2Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE994", FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume3Icon = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE995", FontSize = 16 };
+        
+        private readonly FontIcon NowPlayingMuteIcon1 = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE198",FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume0Icon1 = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE992", FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume1Icon1 = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE993", FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume2Icon1 = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE994", FontSize = 16 };
+        private readonly FontIcon NowPlayingVolume3Icon1 = new FontIcon { FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"), Glyph = "\uE995", FontSize = 16 };
         private FontIcon _volumeGlyph;
+        private FontIcon _nowPlayingVolumeGlyph;
+        private FontIcon _nowPlayingVolumeGlyph1;
 
         MusicInfomation musicInfomation = App.musicInfomation;
         MusicService musicService = App.musicService;
@@ -28,7 +42,6 @@ namespace Live_Music.Helpers
         public VolumeGlyphState()
         {
             ChangeVolumeGlyph();
-            ChangeVolumeGlyph(true);
             musicService.mediaPlayer.VolumeChanged += MediaPlayer_VolumeChanged;
             musicService.mediaPlayer.IsMutedChanged += MediaPlayer_IsMutedChanged;
         }
@@ -39,6 +52,8 @@ namespace Live_Music.Helpers
             {
                 case true:
                     VolumeGlyph = MuteIcon;
+                    NowPlayingVolumeGlyph = NowPlayingMuteIcon;
+                    NowPlayingVolumeGlyph1 = NowPlayingMuteIcon1;
                     break;
                 case false:
                     ChangeVolumeGlyph();
@@ -54,48 +69,32 @@ namespace Live_Music.Helpers
             }
         }
 
-        private void ChangeVolumeGlyph(bool IsInitialize)
-        {
-            if (IsInitialize == true)
-            {
-                double MediaPlayerVolume = musicInfomation.MusicVolumeProperties;
-                if (MediaPlayerVolume > 0.6)
-                {
-                    _volumeGlyph = Volume3Icon;
-                }
-                else if (MediaPlayerVolume > 0.3 && MediaPlayerVolume < 0.6)
-                {
-                    _volumeGlyph = Volume2Icon;
-                }
-                else if (MediaPlayerVolume > 0 && MediaPlayerVolume < 0.3)
-                {
-                    _volumeGlyph = Volume1Icon;
-                }
-                else if (MediaPlayerVolume == 0)
-                {
-                    _volumeGlyph = Volume0Icon;
-                }
-            }
-        }
-
         public void ChangeVolumeGlyph()
         {
             double MediaPlayerVolume = musicInfomation.MusicVolumeProperties;
             if (MediaPlayerVolume > 0.6)
             {
                 VolumeGlyph = Volume3Icon;
+                NowPlayingVolumeGlyph = NowPlayingVolume3Icon;
+                NowPlayingVolumeGlyph1 = NowPlayingVolume3Icon1;
             }
             else if (MediaPlayerVolume > 0.3 && MediaPlayerVolume < 0.6)
             {
                 VolumeGlyph = Volume2Icon;
+                NowPlayingVolumeGlyph = NowPlayingVolume2Icon;
+                NowPlayingVolumeGlyph1 = NowPlayingVolume2Icon1;
             }
             else if (MediaPlayerVolume > 0 && MediaPlayerVolume < 0.3)
             {
                 VolumeGlyph = Volume1Icon;
+                NowPlayingVolumeGlyph = NowPlayingVolume1Icon;
+                NowPlayingVolumeGlyph1 = NowPlayingVolume1Icon1;
             }
             else if (MediaPlayerVolume == 0)
             {
                 VolumeGlyph = Volume0Icon;
+                NowPlayingVolumeGlyph = NowPlayingVolume0Icon;
+                NowPlayingVolumeGlyph1 = NowPlayingVolume0Icon1;
             }
         }
 
@@ -117,6 +116,26 @@ namespace Live_Music.Helpers
             set
             {
                 _volumeGlyph = value;
+                OnPropertiesChanged();
+            }
+        }
+        
+        public FontIcon NowPlayingVolumeGlyph
+        {
+            get => _nowPlayingVolumeGlyph;
+            set
+            {
+                _nowPlayingVolumeGlyph = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        public FontIcon NowPlayingVolumeGlyph1
+        {
+            get => _nowPlayingVolumeGlyph1;
+            set
+            {
+                _nowPlayingVolumeGlyph1 = value;
                 OnPropertiesChanged();
             }
         }
