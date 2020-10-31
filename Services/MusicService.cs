@@ -36,6 +36,7 @@ namespace Live_Music.Services
         public MusicService()
         {
             mediaPlayer.AutoPlay = true;
+            mediaPlayer.AudioCategory = MediaPlayerAudioCategory.Media;
             mediaPlayer.Volume = App.musicInfomation.MusicVolumeProperties;
         }
 

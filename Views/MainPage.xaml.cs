@@ -856,7 +856,6 @@ namespace Live_Music
                             {
                                 BackgroundImage = new TileBackgroundImage()
                                 {
-                                    //Source = "Assets/NullAlbum.png"
                                     Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"
                                 }
                             }
