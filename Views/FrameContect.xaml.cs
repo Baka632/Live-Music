@@ -46,7 +46,13 @@ namespace Live_Music.Views
         /// 音乐服务的实例
         /// </summary>
         MusicService musicService = App.musicService;
+        /// <summary>
+        /// 音乐文件的列表
+        /// </summary>
         IReadOnlyList<StorageFile> fileList;
+        /// <summary>
+        /// 音乐标题的列表
+        /// </summary>
         public ObservableCollection<string> musicTitleList = new ObservableCollection<string>();
 
         /// <summary>

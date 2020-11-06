@@ -43,6 +43,9 @@ namespace Live_Music.Views
         /// 指示是否第一次进入页面
         /// </summary>
         bool IsFirstTimeEnterPage = true;
+        /// <summary>
+        /// 声音图标状态的实例
+        /// </summary>
         VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
 
         /// <summary>

@@ -25,9 +25,8 @@ namespace Live_Music.Services
         /// </summary>
         public MediaPlaybackList mediaPlaybackList = new MediaPlaybackList();
         /// <summary>
-        /// 访问本地设置的实例
+        /// 指示音乐服务是否被清理的值
         /// </summary>
-        ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
         private bool disposedValue;
 
         /// <summary>

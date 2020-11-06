@@ -20,15 +20,11 @@ namespace Live_Music.Helpers
     public class MusicInfomation : DependencyObject, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        /// <summary>
-        /// 访问本地设置的实例
-        /// </summary>
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         /// <summary>
         /// 播放器音量,默认值为1
         /// </summary>
-        double MusicVolume = (double)(ApplicationData.Current.LocalSettings.Values["MusicVolume"] ?? 1);
+        double MusicVolume = App.settings.MusicVolume;
         /// <summary>
         /// 专辑艺术家,默认值为空("")
         /// </summary>

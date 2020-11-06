@@ -123,6 +123,7 @@
     </Compile>
     <Compile Include="Helpers\ImageColors.cs" />
     <Compile Include="Helpers\MusicInfomation.cs" />
+    <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\TileHelper.cs" />
     <Compile Include="Helpers\VolumeGlyphState.cs" />
     <Compile Include="Services\CompactPageService.cs" />

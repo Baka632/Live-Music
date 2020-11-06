@@ -75,8 +75,19 @@ namespace Live_Music
                 case null:
                     break;
             }
+#if DEBUG
+            Debug.WriteLine("[Info]现在的设置列表:");
+            foreach (var item in localSettings.Values)
+            {
+                Debug.WriteLine(item.ToString());
+            }
+#endif
         }
 
+        /// <summary>
+        /// 应用程序设置的实例
+        /// </summary>
+        public static Settings settings = new Settings();
         /// <summary>
         /// 音乐信息的实例
         /// </summary>
@@ -85,13 +96,11 @@ namespace Live_Music
         /// 音乐服务的实例
         /// </summary>
         public static MusicService musicService = new MusicService();
+        /// <summary>
+        /// 声音图标状态的实例
+        /// </summary>
         public static VolumeGlyphState volumeGlyphState = new VolumeGlyphState();
 
-        /// <summary>
-        /// 访问本地设置的实例
-        /// </summary>
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        ApplicationDataCompositeValue SuspendedData = new ApplicationDataCompositeValue();
         /// <summary>
         /// 在用户代码中未处理的异常的出现数量
         /// </summary>
@@ -108,6 +117,7 @@ namespace Live_Music
         /// 此值指示应用是否在后台模式
         /// </summary>
         bool IsInBackgroundMode;
+        private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         /// <summary>
         /// 未在用户代码中处理的异常的异常处理程序
@@ -134,9 +144,9 @@ namespace Live_Music
 
             if (UnhandledExceptionCount > 3)
             {
-                Debug.WriteLine("\n出现了未在用户代码中进行处理的异常,且此异常出现了3次以上!");
-                Debug.WriteLine($"这种情况出现了{UnhandledExceptionCount}次。");
-                Debug.WriteLine($"更多信息:\n{e.Message}");
+                Debug.WriteLine("\n[Exception]出现了未在用户代码中进行处理的异常,且此异常出现了3次以上!");
+                Debug.WriteLine($"[Exception]这种情况出现了{UnhandledExceptionCount}次。");
+                Debug.WriteLine($"[Exception]更多信息:\n{e.Message}");
                 exceptionDetailsDialog.Title = $"应用程序出现了一个异常";
                 exceptionDetailsDialog.Content = textBlock.Text = $"(!)异常出现了三次以上,强烈建议向我们报告这个问题\n\n异常名称:{e.Exception.GetType().FullName}\n详细信息:{e.Message}";
                 IsExceptionHappenedOverThree = true;
@@ -152,9 +162,9 @@ namespace Live_Music
             }
             else
             {
-                Debug.WriteLine("\n出现了未在用户代码中进行处理的异常!");
-                Debug.WriteLine($"这种情况出现了{UnhandledExceptionCount}次。");
-                Debug.WriteLine($"更多信息:\n{e.Message}");
+                Debug.WriteLine("\n[Exception]出现了未在用户代码中进行处理的异常!");
+                Debug.WriteLine($"[Exception]这种情况出现了{UnhandledExceptionCount}次。");
+                Debug.WriteLine($"[Exception]更多信息:\n{e.Message}");
                 exceptionDetailsDialog.Title = $"应用程序出现了一个异常";
                 exceptionDetailsDialog.Content = textBlock.Text = $"异常名称:{e.Exception.GetType().FullName}\n详细信息:{e.Message}";
                 try
@@ -176,7 +186,7 @@ namespace Live_Music
         private void AppEnteredBackground(object sender, EnteredBackgroundEventArgs e)
         {
             IsInBackgroundMode = true;
-            Debug.WriteLine("已进入后台");
+            Debug.WriteLine("[StateChanged]已进入后台");
         }
 
         /// <summary>
@@ -191,7 +201,7 @@ namespace Live_Music
             {
                 CreateRootFrame(ApplicationExecutionState.Running, string.Empty);
             }
-            Debug.WriteLine("已离开后台");
+            Debug.WriteLine("[StateChanged]已离开后台");
         }
 
         /// <summary>
@@ -201,7 +211,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void AppMemoryUsageLimitChanging(object sender, AppMemoryUsageLimitChangingEventArgs e)
         {
-            Debug.WriteLine("内存限制量发生了改变");
+            Debug.WriteLine("[MemoryUsage]内存限制量发生了改变");
             if (MemoryManager.AppMemoryUsage >= e.NewLimit)
             {
                 ReduceMemoryUsage(e.NewLimit);
@@ -218,7 +228,7 @@ namespace Live_Music
             var level = MemoryManager.AppMemoryUsageLevel;
             if (level == AppMemoryUsageLevel.OverLimit || level == AppMemoryUsageLevel.High)
             {
-                Debug.WriteLine("警告:内存使用量到达上限");
+                Debug.WriteLine("[MemoryUsage]警告:内存使用量到达上限");
                 ReduceMemoryUsage(MemoryManager.AppMemoryUsageLimit);
             }
         }
@@ -229,17 +239,17 @@ namespace Live_Music
         /// <param name="limit"></param>
         public void ReduceMemoryUsage(ulong limit)
         {
-            Debug.WriteLine("正在尝试减少应用内存使用量");
+            Debug.WriteLine("[MemoryUsage]正在尝试减少应用内存使用量");
             if (IsInBackgroundMode==true && Window.Current.Content != null)
             {
-                Debug.WriteLine("正在卸载主页面内容");
+                Debug.WriteLine("[MemoryUsage]正在卸载主页面内容");
                 Window.Current.Content = null;
-                Debug.WriteLine("正在清理音乐及其信息服务的资源...");
+                Debug.WriteLine("[MemoryUsage]正在清理音乐及其信息服务的资源...");
                 musicService.Dispose();
                 musicInfomation.ResetAllMusicProperties();
-                Debug.WriteLine("完成。");
+                Debug.WriteLine("[MemoryUsage]完成。");
             }
-            Debug.WriteLine("正强制启动垃圾回收器");
+            Debug.WriteLine("[MemoryUsage]正强制启动垃圾回收器");
             GC.Collect();
         }
 
@@ -264,7 +274,7 @@ namespace Live_Music
                 if (previousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: 从之前挂起的应用程序加载状态
-                    musicService.mediaPlayer.Volume = (double)localSettings.Values["MusicVolume"];
+                    musicService.mediaPlayer.Volume = settings.MusicVolume;
                 }
                 Window.Current.Content = rootFrame;
             }
@@ -366,8 +376,8 @@ namespace Live_Music
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: 从之前挂起的应用程序加载状态
-                    Debug.WriteLine("上次的状态:挂起后被关闭");
-                    Debug.WriteLine("已自动恢复以下信息:播放器音量");
+                    Debug.WriteLine("[Resume]上次的状态:挂起后被关闭");
+                    Debug.WriteLine("[Resume]已自动恢复以下信息:播放器音量");
                 }
 
                 // 将框架放在当前窗口中
@@ -389,7 +399,7 @@ namespace Live_Music
                     if (SystemInformation.IsFirstRun == true)
                     {
                         rootFrame.Navigate(typeof(FirstStart), null, new SuppressNavigationTransitionInfo());
-                        localSettings.Values["MusicVolume"] = 1d;
+                        settings.MusicVolume = 1d;
                     }
                     else
                     {
@@ -422,12 +432,12 @@ namespace Live_Music
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
-            Debug.WriteLine("将要进入挂起态");
+            Debug.WriteLine("[Suspending]将要进入挂起态");
 
-            localSettings.Values["MusicVolume"] = musicService.mediaPlayer.Volume; //保存现在的音量
-            Debug.WriteLine("==已保存现在的音量==");
+            settings.MusicVolume = musicService.mediaPlayer.Volume; //保存现在的音量
+            Debug.WriteLine("[Suspending]已保存现在的音量");
 
-            Debug.WriteLine("进入挂起态");
+            Debug.WriteLine("[Suspending]进入挂起态");
             deferral.Complete();
         }
 

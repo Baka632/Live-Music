@@ -48,10 +48,6 @@ namespace Live_Music
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        /// <summary>
-        /// 访问本地设置的实例
-        /// </summary>
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         public event PropertyChangedEventHandler PropertyChanged;
         /// <summary>
         /// 磁贴助手的实例
@@ -97,8 +93,13 @@ namespace Live_Music
         /// 用于保存专辑缩略图的文件名
         /// </summary>
         string AlbumSaveName = "";
-        double VolumeInSlider;
+        /// <summary>
+        /// SMTC显示属性的实例
+        /// </summary>
         MediaItemDisplayProperties props;
+        /// <summary>
+        /// 声音图标状态的实例
+        /// </summary>
         VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
 
         /// <summary>
@@ -165,7 +166,6 @@ namespace Live_Music
             stopPlayingButton.IsEnabled = false;
 
             popup = panePopup;
-            VolumeInSlider = musicInfomation.MusicVolumeProperties;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
@@ -822,6 +822,9 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// 指示内嵌的Frame是否能够返回的属性
+        /// </summary>
         private bool ContentFrameCanGoBack
         {
             get => _ContentFrameCanGoBack;
