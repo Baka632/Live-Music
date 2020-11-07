@@ -433,13 +433,21 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void StopMusic(object sender, RoutedEventArgs e)
+        private async void StopMusic(object sender, RoutedEventArgs e)
         {
-            musicProcessStackPanel.Visibility = Visibility.Collapsed;
-            stopPlayingButton.IsEnabled = false;
-            ChangeMusicControlButtonsUsableState();
-            ResetMusicPropertiesList();
-            musicService.StopMusic();
+            ContentDialog contentDialog = new ContentDialog();
+            contentDialog.Title = "警告!";
+            contentDialog.Content = "由于未知的原因,在清空正在播放列表后打开音乐将导致应用崩溃\n\n你确定要清空吗?";
+            contentDialog.PrimaryButtonText = "是";
+            contentDialog.CloseButtonText = "否";
+            if (await contentDialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                musicProcessStackPanel.Visibility = Visibility.Collapsed;
+                stopPlayingButton.IsEnabled = false;
+                ChangeMusicControlButtonsUsableState();
+                ResetMusicPropertiesList();
+                musicService.StopMusic();
+            }
         }
 
         /// <summary>
