@@ -8,6 +8,9 @@ using Windows.Storage;
 
 namespace Live_Music.Helpers
 {
+    /// <summary>
+    /// 为应用程序的设置提供属性
+    /// </summary>
     public class Settings
     {
         /// <summary>

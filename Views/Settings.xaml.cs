@@ -40,13 +40,13 @@ namespace Live_Music.FirstStartPages
             switch (Theme)
             {
                 case "浅色":
-                    localSettings.Values["ThemeSetting"] = ThemeSettings.Light.ToString();
+                    App.settings.ThemeSettings = ThemeSettings.Light.ToString();
                     break;
                 case "深色":
-                    localSettings.Values["ThemeSetting"] = ThemeSettings.Dark.ToString();
+                    App.settings.ThemeSettings = ThemeSettings.Dark.ToString();
                     break;
                 case "使用系统设置":
-                    localSettings.Values["ThemeSetting"] = ThemeSettings.Default.ToString();
+                    App.settings.ThemeSettings = ThemeSettings.Default.ToString();
                     break;
             }
         }
