@@ -36,7 +36,6 @@ using Windows.UI.ViewManagement;
 using Windows.ApplicationModel.Core;
 using Windows.Devices.Custom;
 using Live_Music.Views;
-using LiveStudioSharedUWP.LiveStudioCollections;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 //使用了Win2D,Microsoft Toolkit和Windows UI

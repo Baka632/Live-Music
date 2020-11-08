@@ -23,7 +23,6 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
-using LiveStudioSharedUWP.LiveStudioCollections;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
