@@ -123,10 +123,6 @@ namespace Live_Music.Services
                 case MediaPlaybackState.None:
                     mediaPlayer.Play();
                     break;
-                case MediaPlaybackState.Opening:
-                    break;
-                case MediaPlaybackState.Buffering:
-                    break;
                 case MediaPlaybackState.Playing:
                     mediaPlayer.Pause();
                     break;
