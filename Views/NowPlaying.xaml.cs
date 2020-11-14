@@ -55,7 +55,7 @@ namespace Live_Music.Views
         {
             this.InitializeComponent();
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
-            NavigationCacheMode = NavigationCacheMode.Enabled;
+            NavigationCacheMode = NavigationCacheMode.Required;
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
                 case MediaPlaybackState.Playing:

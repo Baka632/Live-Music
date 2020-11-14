@@ -389,12 +389,6 @@ namespace Live_Music
                 {
                     // 当导航堆栈尚未还原时，导航到第一页，
                     // 并通过将所需信息作为导航参数传入来配置参数
-
-                    //TODO: 此代码块仅为了测试用，在测试完毕后应删除下方已注释的代码块!
-                    //if (localSettings.Values["FirstStart"] == null) 
-                    //{
-                    //    rootFrame.Navigate(typeof(FirstStart), null, new SuppressNavigationTransitionInfo());
-                    //}
                     if (SystemInformation.IsFirstRun == true)
                     {
                         rootFrame.Navigate(typeof(FirstStart), null, new SuppressNavigationTransitionInfo());

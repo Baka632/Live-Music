@@ -42,7 +42,7 @@ namespace Live_Music.Helpers
                 return await GetThemeColor(colors);
             }
 
-            #region Methon：方法
+            #region Method：方法
             private async Task<Color> GetThemeColor(Color[] colors)
             {
                 Color color = new Color();

@@ -36,6 +36,7 @@ using Windows.UI.ViewManagement;
 using Windows.ApplicationModel.Core;
 using Windows.Devices.Custom;
 using Live_Music.Views;
+using System.Threading.Tasks;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 //使用了Win2D,Microsoft Toolkit和Windows UI
@@ -122,14 +123,6 @@ namespace Live_Music
         /// </summary>
         string ShufflingMusicState = "随机播放:关";
 
-        ///// <summary>
-        ///// 音乐艺术家的列表
-        ///// </summary>
-        //Dictionary<int,string> MusicArtistList = new Dictionary<int, string>();
-        ///// <summary>
-        ///// 音乐标题的列表
-        ///// </summary>
-        //Dictionary<int, string> MusicTitleList = new Dictionary<int, string>();
         /// <summary>
         /// 音乐缩略图的列表
         /// </summary>
@@ -138,18 +131,9 @@ namespace Live_Music
         /// 音乐缩略图主题色的列表
         /// </summary>
         Dictionary<int,Color> MusicGirdColorsList = new Dictionary<int, Color>();
-        ///// <summary>
-        ///// 音乐长度的列表
-        ///// </summary>
-        //Dictionary<int,string> MusicLenthList = new Dictionary<int, string>();
-        ///// <summary>
-        ///// 音乐实际长度的列表(未被转换为string)
-        ///// </summary>
-        //Dictionary<int,double> MusicDurationList = new Dictionary<int, double>();
-        ///// <summary>
-        ///// 音乐专辑名称的列表
-        ///// </summary>
-        //Dictionary<int, string> MusicAlbumList = new Dictionary<int, string>();
+        /// <summary>
+        /// 音乐属性的列表
+        /// </summary>
         Dictionary<int, MusicProperties> MusicPropertiesList = new Dictionary<int, MusicProperties>();
 
         /// <summary>
@@ -429,21 +413,13 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void StopMusic(object sender, RoutedEventArgs e)
+        private void StopMusic(object sender, RoutedEventArgs e)
         {
-            ContentDialog contentDialog = new ContentDialog();
-            contentDialog.Title = "警告!";
-            contentDialog.Content = "由于未知的原因,在清空正在播放列表后打开音乐将导致应用崩溃\n\n你确定要清空吗?";
-            contentDialog.PrimaryButtonText = "是";
-            contentDialog.CloseButtonText = "否";
-            if (await contentDialog.ShowAsync() == ContentDialogResult.Primary)
-            {
-                musicProcessStackPanel.Visibility = Visibility.Collapsed;
-                stopPlayingButton.IsEnabled = false;
-                ChangeMusicControlButtonsUsableState();
-                ResetMusicPropertiesList();
-                musicService.StopMusic();
-            }
+            musicProcessStackPanel.Visibility = Visibility.Collapsed;
+            stopPlayingButton.IsEnabled = false;
+            ChangeMusicControlButtonsUsableState();
+            ResetMusicPropertiesList();
+            musicService.StopMusic();
         }
 
         /// <summary>
@@ -544,7 +520,7 @@ namespace Live_Music
             MusicPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
             MusicPicker.FileTypeFilter.Add(".mp3");
             MusicPicker.FileTypeFilter.Add(".wav");
-            MusicPicker.FileTypeFilter.Add(".wma"); // TODO: Add more file type
+            MusicPicker.FileTypeFilter.Add(".wma");
 
             StorageFile file = await MusicPicker.PickSingleFileAsync();
 
@@ -564,13 +540,12 @@ namespace Live_Music
         {
             mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
             musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
-
-            BitmapImage bitmapImage = new BitmapImage();
-            InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
-
             int mediaPlayBackItemHashCode = mediaPlaybackItem.GetHashCode();
 
-            MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+            Task<MusicProperties> musicPropertiesTask = file.Properties.GetMusicPropertiesAsync().AsTask();
+            musicPropertiesTask.Wait();
+            MusicProperties musicProperties = musicPropertiesTask.Result;
+
             if (string.IsNullOrWhiteSpace(musicProperties.Artist) == true)
             {
                 musicProperties.AlbumArtist = "未知艺术家";
@@ -588,16 +563,19 @@ namespace Live_Music
 
             MusicPropertiesList.Add(mediaPlayBackItemHashCode, musicProperties);
 
-            var thumbnail = await file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem);
-            await RandomAccessStream.CopyAsync(thumbnail, randomAccessStream);
-            randomAccessStream.Seek(0);
-            await bitmapImage.SetSourceAsync(randomAccessStream);
-            MusicImageList.Add(mediaPlayBackItemHashCode,bitmapImage);
+            Task<StorageItemThumbnail> musicThumbnailTask = file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem).AsTask();
+            musicThumbnailTask.Wait();
+
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.SetSource(musicThumbnailTask.Result);
+
+            MusicImageList.Add(mediaPlayBackItemHashCode, bitmapImage);
 
             ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
-            var color = await imageThemeBrush.GetPaletteImage(randomAccessStream);
-
-            MusicGirdColorsList.Add(mediaPlayBackItemHashCode, color);
+            Task<Color> imageColorsTask = Task.Run(() => imageThemeBrush.GetPaletteImage(musicThumbnailTask.Result));
+            imageColorsTask.Wait();
+            //var color = await imageThemeBrush.GetPaletteImage(randomAccessStream); //TODO: 有问题!
+            MusicGirdColorsList.Add(mediaPlayBackItemHashCode, imageColorsTask.Result);
 
             if (IsFirstTimeAddMusic == true)
             {
@@ -616,7 +594,7 @@ namespace Live_Music
 
             using (var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
             {
-                await WindowsRuntimeStreamExtensions.AsStreamForRead(thumbnail.GetInputStreamAt(0)).CopyToAsync(fileStream);
+                await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
             }
         }
 
@@ -760,8 +738,7 @@ namespace Live_Music
                 case "正在播放":
                     if (mainContectFrame.CurrentSourcePageType != typeof(NowPlaying))
                     {
-                        Frame.Navigate(typeof(NowPlaying), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
-                        IsEnteringNowPlaying = true;
+                        EnterNowPlaying();
                     }
                     break;
             }
@@ -827,7 +804,11 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void EnterNowPlaying(object sender, RoutedEventArgs e) => Frame.Navigate(typeof(NowPlaying), null, new EntranceNavigationTransitionInfo());
+        private void EnterNowPlaying(object sender = null, RoutedEventArgs e = null)
+        {
+            IsEnteringNowPlaying = true;
+            Frame.Navigate(typeof(NowPlaying), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
+        }
 
         /// <summary>
         /// 设置磁贴的源
@@ -960,7 +941,7 @@ namespace Live_Music
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter is StorageFile file && e.Parameter != null)
+            if (e.Parameter is StorageFile file && e.Parameter != null && IsEnteringNowPlaying == false)
             {
                 OpenMusicFile(file);
             }
