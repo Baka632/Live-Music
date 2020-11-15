@@ -505,6 +505,7 @@ namespace Live_Music
         {
             if (fileList.Count > 0)
             {
+                TotalIndex = 0;
                 ResetMusicPropertiesList();
                 if (musicService.mediaPlaybackList.Items != null)
                 {
