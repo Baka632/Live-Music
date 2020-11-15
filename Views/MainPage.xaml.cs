@@ -86,10 +86,6 @@ namespace Live_Music
         /// </summary>
         public static bool IsPointerEntered = false;
         /// <summary>
-        /// 用于保存专辑缩略图的文件名
-        /// </summary>
-        string AlbumSaveName = "";
-        /// <summary>
         /// SMTC显示属性的实例
         /// </summary>
         MediaItemDisplayProperties props;
@@ -122,19 +118,24 @@ namespace Live_Music
         /// 随机播放的状态
         /// </summary>
         string ShufflingMusicState = "随机播放:关";
+        int TotalIndex = 0;
 
         /// <summary>
         /// 音乐缩略图的列表
         /// </summary>
-        Dictionary<int,BitmapImage> MusicImageList = new Dictionary<int, BitmapImage>();
+        Dictionary<int, BitmapImage> MusicImageList = new Dictionary<int, BitmapImage>();
         /// <summary>
         /// 音乐缩略图主题色的列表
         /// </summary>
-        Dictionary<int,Color> MusicGirdColorsList = new Dictionary<int, Color>();
+        Dictionary<int, Color> MusicGirdColorsList = new Dictionary<int, Color>();
         /// <summary>
         /// 音乐属性的列表
         /// </summary>
         Dictionary<int, MusicProperties> MusicPropertiesList = new Dictionary<int, MusicProperties>();
+        private static string[] supportedAudioFormats = new string[]
+        {
+            ".mp3", ".wav", ".wma",".3g2", ".3gp2", ".3gp", ".3gpp", ".m4a", ".asf", ".aac", ".adt", ".adts", ".ac3", ".ec3",
+        };
 
         /// <summary>
         /// 初始化MainPage类的新实例
@@ -254,14 +255,20 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PreviousMusic(object sender, RoutedEventArgs e) => musicService.PreviousMusic();
+        private void PreviousMusic(object sender, RoutedEventArgs e)
+        {
+            musicService.PreviousMusic();
+        }
 
         /// <summary>
         /// 切换到下一个音乐
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void NextMusic(object sender, RoutedEventArgs e) => musicService.NextMusic();
+        private void NextMusic(object sender, RoutedEventArgs e)
+        {
+            musicService.NextMusic();
+        }
 
         /// <summary>
         /// 改变播放器的"随机播放"属性
@@ -366,17 +373,17 @@ namespace Live_Music
         {
             if (musicService.mediaPlaybackList.CurrentItem != null)
             {
-                int CurrentItemHashCode = musicService.mediaPlaybackList.CurrentItem.GetHashCode();
+                int CurrentItemIndex = (int)musicService.mediaPlaybackList.CurrentItemIndex;
 
-                musicInfomation.MusicAlbumArtistProperties = MusicPropertiesList[CurrentItemHashCode].AlbumArtist;
-                musicInfomation.MusicTitleProperties = MusicPropertiesList[CurrentItemHashCode].Title;
-                musicInfomation.MusicImageProperties = MusicImageList[CurrentItemHashCode];
-                musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemHashCode];
-                musicInfomation.MusicLenthProperties = MusicPropertiesList[CurrentItemHashCode].Duration.ToString(@"m\:ss");
-                musicInfomation.MusicDurationProperties = MusicPropertiesList[CurrentItemHashCode].Duration.TotalSeconds;
-                musicInfomation.MusicAlbumProperties = MusicPropertiesList[CurrentItemHashCode].Album;
+                musicInfomation.MusicAlbumArtistProperties = MusicPropertiesList[CurrentItemIndex].AlbumArtist;
+                musicInfomation.MusicTitleProperties = MusicPropertiesList[CurrentItemIndex].Title;
+                musicInfomation.MusicImageProperties = MusicImageList[CurrentItemIndex];
+                musicInfomation.GridAcrylicBrushColorProperties = MusicGirdColorsList[CurrentItemIndex];
+                musicInfomation.MusicLenthProperties = MusicPropertiesList[CurrentItemIndex].Duration.ToString(@"m\:ss");
+                musicInfomation.MusicDurationProperties = MusicPropertiesList[CurrentItemIndex].Duration.TotalSeconds;
+                musicInfomation.MusicAlbumProperties = MusicPropertiesList[CurrentItemIndex].Album;
 
-                StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.GetFileAsync($"{AlbumSaveName}.jpg");
+                StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.GetFileAsync($"{musicInfomation.MusicAlbumProperties.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty)}.jpg");
                 props = mediaPlaybackItem.GetDisplayProperties();
                 props.Type = Windows.Media.MediaPlaybackType.Music;
                 props.MusicProperties.Title = musicInfomation.MusicTitleProperties;
@@ -466,6 +473,7 @@ namespace Live_Music
         /// </summary>
         private void ResetMusicPropertiesList()
         {
+            TotalIndex = 0;
             musicInfomation.ResetAllMusicProperties();
             MusicPropertiesList.Clear();
             MusicGirdColorsList.Clear();
@@ -492,17 +500,17 @@ namespace Live_Music
         /// <summary>
         /// 直接打开音乐文件来播放音乐(应用外)
         /// </summary>
-        /// <param name="file">传入的文件</param>
-        public void OpenMusicFile(StorageFile file)
+        /// <param name="fileList">传入的文件</param>
+        public void OpenMusicFile(IReadOnlyList<StorageFile> fileList)
         {
-            if (file != null)
+            if (fileList.Count > 0)
             {
                 ResetMusicPropertiesList();
                 if (musicService.mediaPlaybackList.Items != null)
                 {
                     musicService.mediaPlaybackList.Items.Clear();
                 }
-                PlayAndGetMusicProperites(file);
+                PlayAndGetMusicProperites(fileList);
                 mediaControlStackPanel.Visibility = Visibility.Visible;
                 musicProcessStackPanel.Visibility = Visibility.Visible;
             }
@@ -518,15 +526,16 @@ namespace Live_Music
             var MusicPicker = new Windows.Storage.Pickers.FileOpenPicker();
             MusicPicker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
             MusicPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
-            MusicPicker.FileTypeFilter.Add(".mp3");
-            MusicPicker.FileTypeFilter.Add(".wav");
-            MusicPicker.FileTypeFilter.Add(".wma");
-
-            StorageFile file = await MusicPicker.PickSingleFileAsync();
-
-            if (file != null)
+            foreach (string fileExtension in supportedAudioFormats)
             {
-                PlayAndGetMusicProperites(file);
+                MusicPicker.FileTypeFilter.Add(fileExtension);
+            }
+
+            IReadOnlyList<StorageFile> fileList = await MusicPicker.PickMultipleFilesAsync();
+
+            if (fileList.Count > 0)
+            {
+                PlayAndGetMusicProperites(fileList);
                 mediaControlStackPanel.Visibility = Visibility.Visible;
                 musicProcessStackPanel.Visibility = Visibility.Visible;
             }
@@ -536,47 +545,14 @@ namespace Live_Music
         /// 播放音乐,以及获取音乐的属性
         /// </summary>
         /// <param name="file">传入的音乐文件</param>
-        private async void PlayAndGetMusicProperites(StorageFile file)
+        private async void PlayAndGetMusicProperites(IReadOnlyList<StorageFile> fileList)
         {
-            mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(file));
-            musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
-            int mediaPlayBackItemHashCode = mediaPlaybackItem.GetHashCode();
-
-            Task<MusicProperties> musicPropertiesTask = file.Properties.GetMusicPropertiesAsync().AsTask();
-            musicPropertiesTask.Wait();
-            MusicProperties musicProperties = musicPropertiesTask.Result;
-
-            if (string.IsNullOrWhiteSpace(musicProperties.Artist) == true)
+            for (int i = 0; i < fileList.Count; i++)
             {
-                musicProperties.AlbumArtist = "未知艺术家";
+                mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList[i]));
+                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
             }
-
-            if (string.IsNullOrWhiteSpace(musicProperties.Title) == true)
-            {
-                musicProperties.Title = file.Name;
-            }
-
-            if (string.IsNullOrWhiteSpace(musicProperties.Album) == true)
-            {
-                musicProperties.Album = "未知专辑";
-            }
-
-            MusicPropertiesList.Add(mediaPlayBackItemHashCode, musicProperties);
-
-            Task<StorageItemThumbnail> musicThumbnailTask = file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem).AsTask();
-            musicThumbnailTask.Wait();
-
-            BitmapImage bitmapImage = new BitmapImage();
-            bitmapImage.SetSource(musicThumbnailTask.Result);
-
-            MusicImageList.Add(mediaPlayBackItemHashCode, bitmapImage);
-
-            ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
-            Task<Color> imageColorsTask = Task.Run(() => imageThemeBrush.GetPaletteImage(musicThumbnailTask.Result));
-            imageColorsTask.Wait();
-            //var color = await imageThemeBrush.GetPaletteImage(randomAccessStream); //TODO: 有问题!
-            MusicGirdColorsList.Add(mediaPlayBackItemHashCode, imageColorsTask.Result);
-
+            
             if (IsFirstTimeAddMusic == true)
             {
                 musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
@@ -589,12 +565,52 @@ namespace Live_Music
                 musicService.mediaPlayer.Play();
             }
 
-            AlbumSaveName = musicProperties.Album;
-            AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
-
-            using (var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
+            for (int i = 0; i < fileList.Count; i++)
             {
-                await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
+                StorageFile file = fileList[i];
+
+                Task<MusicProperties> musicPropertiesTask = file.Properties.GetMusicPropertiesAsync().AsTask();
+                musicPropertiesTask.Wait();
+                MusicProperties musicProperties = musicPropertiesTask.Result;
+
+                if (string.IsNullOrWhiteSpace(musicProperties.Artist) == true)
+                {
+                    musicProperties.AlbumArtist = "未知艺术家";
+                }
+
+                if (string.IsNullOrWhiteSpace(musicProperties.Title) == true)
+                {
+                    musicProperties.Title = file.Name;
+                }
+
+                if (string.IsNullOrWhiteSpace(musicProperties.Album) == true)
+                {
+                    musicProperties.Album = "未知专辑";
+                }
+
+                MusicPropertiesList.Add(TotalIndex, musicProperties);
+
+                Task<StorageItemThumbnail> musicThumbnailTask = file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem).AsTask();
+                musicThumbnailTask.Wait();
+
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.SetSource(musicThumbnailTask.Result);
+
+                MusicImageList.Add(TotalIndex, bitmapImage);
+
+                ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
+                Task<Color> imageColorsTask = Task.Run(() => imageThemeBrush.GetPaletteImage(musicThumbnailTask.Result));
+                imageColorsTask.Wait();
+                MusicGirdColorsList.Add(TotalIndex, imageColorsTask.Result);
+
+                string AlbumSaveName = musicProperties.Album;
+                AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
+
+                using (var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
+                {
+                    await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
+                }
+                TotalIndex++;
             }
         }
 
@@ -815,6 +831,7 @@ namespace Live_Music
         /// </summary>
         private async void SetTileSource()
         {
+            string album = $"{musicInfomation.MusicAlbumProperties.Replace(":", string.Empty).Replace(" / ", string.Empty).Replace("\\", string.Empty).Replace(" ? ", string.Empty).Replace(" * ", string.Empty).Replace(" | ", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty)}";
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 var tileContent = new TileContent()
@@ -827,7 +844,7 @@ namespace Live_Music
                             {
                                 BackgroundImage = new TileBackgroundImage()
                                 {
-                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"
+                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.jpg"
                                 }
                             }
                         },
@@ -859,7 +876,7 @@ namespace Live_Music
                                 },
                                 PeekImage = new TilePeekImage()
                                 {
-                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"
+                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.jpg"
                                 }
                             }
                         },
@@ -892,7 +909,7 @@ namespace Live_Music
                                 },
                                 PeekImage = new TilePeekImage()
                                 {
-                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"
+                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.jpg"
                                 }
                             }
                         },
@@ -923,7 +940,7 @@ namespace Live_Music
                                 },
                                 PeekImage = new TilePeekImage()
                                 {
-                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"
+                                    Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.jpg"
                                 }
                             }
                         }
@@ -941,7 +958,7 @@ namespace Live_Music
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Parameter is StorageFile file && e.Parameter != null && IsEnteringNowPlaying == false)
+            if (e.Parameter is IReadOnlyList<StorageFile> file && e.Parameter != null && IsEnteringNowPlaying == false)
             {
                 OpenMusicFile(file);
             }

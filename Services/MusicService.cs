@@ -85,6 +85,7 @@ namespace Live_Music.Services
         public void StopMusic()
         {
             mediaPlayer.Pause();
+            mediaPlayer.PlaybackSession.Position = TimeSpan.Zero;
             mediaPlaybackList.Items.Clear();
         }
 

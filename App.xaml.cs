@@ -440,14 +440,14 @@ namespace Live_Music
         /// <param name="args"></param>
         protected override void OnFileActivated(FileActivatedEventArgs args)
         {
-            IStorageItem file = args.Files[0];
+            IReadOnlyList<StorageFile> file = (IReadOnlyList<StorageFile>)args.Files;
             Frame frame = Window.Current.Content as Frame;
             if (frame == null)
             {
                 frame = new Frame();
                 Window.Current.Content = frame;
             }
-            frame.Navigate(typeof(MainPage),(StorageFile)file);
+            frame.Navigate(typeof(MainPage),file);
             Window.Current.Activate();
         }
     }
