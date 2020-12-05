@@ -84,6 +84,12 @@ namespace Live_Music
 #endif
         }
 
+        private void NotifyMainPage()
+        {
+            throw new NotImplementedException();
+        }
+
+        delegate void UnhandledExceptionHappened();
         /// <summary>
         /// 应用程序设置的实例
         /// </summary>
@@ -100,7 +106,10 @@ namespace Live_Music
         /// 声音图标状态的实例
         /// </summary>
         public static VolumeGlyphState volumeGlyphState = new VolumeGlyphState();
-
+        /// <summary>
+        /// 应用程序运行过程中的信息的实例
+        /// </summary>
+        public static AppInfomation appInfomation = new AppInfomation();
         /// <summary>
         /// 在用户代码中未处理的异常的出现数量
         /// </summary>
@@ -124,9 +133,23 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender">出现异常的源</param>
         /// <param name="e">有关异常的详细信息</param>
-        private async void AppExceptionHandler(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+        private void AppExceptionHandler(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
+            appInfomation.InfoBarTitle = "应用程序出现了一个异常";
+            appInfomation.InfoBarMessage = "您可以向我们报告,也可以忽略该错误。";
+            appInfomation.InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+            appInfomation.InfoBarButtonClick = (object sender1,RoutedEventArgs e1) => OpenExceptionDialog(e);
+            appInfomation.IsInfoBarOpen = true;
+        }
+
+        /// <summary>
+        /// 打开异常详细信息的对话框
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async void OpenExceptionDialog(Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
             UnhandledExceptionCount++;
             UnhandledExceptionMessage[0] = e.Exception.GetType().FullName;
             UnhandledExceptionMessage[1] = e.Exception.ToString();
@@ -158,7 +181,7 @@ namespace Live_Music
                 {
                     UnhandledExceptionCount = 4;
                 }
-                
+
             }
             else
             {
@@ -214,7 +237,7 @@ namespace Live_Music
             Debug.WriteLine("[MemoryUsage]内存限制量发生了改变");
             if (MemoryManager.AppMemoryUsage >= e.NewLimit)
             {
-                ReduceMemoryUsage(e.NewLimit);
+                ReduceMemoryUsage();
             }
         }
 
@@ -229,7 +252,7 @@ namespace Live_Music
             if (level == AppMemoryUsageLevel.OverLimit || level == AppMemoryUsageLevel.High)
             {
                 Debug.WriteLine("[MemoryUsage]警告:内存使用量到达上限");
-                ReduceMemoryUsage(MemoryManager.AppMemoryUsageLimit);
+                ReduceMemoryUsage();
             }
         }
 
@@ -237,7 +260,7 @@ namespace Live_Music
         /// 减少应用的内存使用量时使用的操作
         /// </summary>
         /// <param name="limit"></param>
-        public void ReduceMemoryUsage(ulong limit)
+        public void ReduceMemoryUsage()
         {
             Debug.WriteLine("[MemoryUsage]正在尝试减少应用内存使用量");
             if (IsInBackgroundMode==true && Window.Current.Content != null)

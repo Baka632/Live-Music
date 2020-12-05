@@ -65,10 +65,7 @@ namespace Live_Music
         /// 单个媒体播放项
         /// </summary>
         MediaPlaybackItem mediaPlaybackItem;
-        /// <summary>
-        /// 通知横幅
-        /// </summary>
-        public static Popup popup;
+        AppInfomation appInfomation = App.appInfomation;
         /// <summary>
         /// 指示内嵌的Frame是否能够返回
         /// </summary>
@@ -132,6 +129,9 @@ namespace Live_Music
         /// 音乐属性的列表
         /// </summary>
         Dictionary<int, MusicProperties> MusicPropertiesList = new Dictionary<int, MusicProperties>();
+        /// <summary>
+        /// 支持的音频格式数组
+        /// </summary>
         private static string[] supportedAudioFormats = new string[]
         {
             ".mp3", ".wav", ".wma",".3g2", ".3gp2", ".3gp", ".3gpp", ".m4a", ".asf", ".aac", ".adt", ".adts", ".ac3", ".ec3",
@@ -145,8 +145,6 @@ namespace Live_Music
             this.InitializeComponent();
             pausePlayingButton.IsEnabled = false;
             stopPlayingButton.IsEnabled = false;
-
-            popup = panePopup;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
@@ -679,16 +677,6 @@ namespace Live_Music
         }
 
         /// <summary>
-        /// 关闭弹出横幅
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ClosePopup(object sender, RoutedEventArgs e)
-        {
-            panePopup.IsOpen = false;
-        }
-
-        /// <summary>
         /// 当volumeSlider的值发生改变时调用的方法
         /// </summary>
         /// <param name="sender"></param>
@@ -765,6 +753,7 @@ namespace Live_Music
             }
             ContentFrameCanGoBack = mainContectFrame.CanGoBack;
         }
+
         /// <summary>
         /// 当导航视图上的返回按钮被点击时调用的方法
         /// </summary>

@@ -390,29 +390,19 @@
             </StackPanel>
         </Grid>
 
-        <Popup x:Name="panePopup" Margin="0,60,0,0" RequestedTheme="Dark">
-            <Popup.Child>
-                <Grid Width="200" Height="50" Background="{ThemeResource SystemControlBackgroundAccentBrush}">
-                    <!--切噜切噜切啤啤切噜噜★-->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
-                        <ProgressRing IsActive="True" Width="25" Height="25" Foreground="White" VerticalAlignment="Center"/>
-                        <TextBlock Text="正在更新媒体库..." FontSize="15" TextWrapping="WrapWholeWords"  VerticalAlignment="Center" Margin="5,0,0,0"/>
-                    </StackPanel>
-                    <Button Click="ClosePopup"  VerticalAlignment="Top" Background="Transparent" CornerRadius="0" HorizontalAlignment="Right">
-                        <Button.Content>
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8BB;" FontSize="10"/>
-                        </Button.Content>
-                    </Button>
-                </Grid>
-            </Popup.Child>
+        <muxc:InfoBar
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Bottom"
+            Severity="{x:Bind appInfomation.InfoBarSeverity,Mode=OneWay}"
+            IsOpen="{x:Bind appInfomation.IsInfoBarOpen,Mode=OneWay}"
+            Title="{x:Bind appInfomation.InfoBarTitle,Mode=OneWay}"
+            Message="{x:Bind appInfomation.InfoBarMessage,Mode=OneWay}" >
+            <muxc:InfoBar.ActionButton>
+                <Button Content="显示详细信息" Click="{x:Bind appInfomation.InfoBarButtonClick,Mode=OneWay}" />
+            </muxc:InfoBar.ActionButton>
+        </muxc:InfoBar>
 
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PaneThemeTransition/>
-                </TransitionCollection>
-            </Popup.ChildTransitions>
-        </Popup>
-        
         <TextBlock x:Name="titleTextBlock" Text="Live Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
     </Grid>
 </Page>
