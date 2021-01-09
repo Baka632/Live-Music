@@ -22,7 +22,6 @@ namespace Live_Music.FirstStartPages
     /// </summary>
     public sealed partial class Settings : Page
     {
-        Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
         private enum ThemeSettings
         {
             Light, Dark, Default

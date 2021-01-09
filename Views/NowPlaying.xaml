@@ -10,7 +10,7 @@
     RequestedTheme="Dark"
     Loaded="Page_Loaded">
     <Page.Resources>
-        <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="#464646"/>
+        <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"/>
         <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">
             <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
             <Setter Property="Foreground" Value="White"/>
@@ -208,7 +208,7 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <Grid x:Name="sliderStackPanel" Grid.Row="1"  Margin="0,0,25,0">
+                    <Grid x:Name="sliderGrid" Grid.Row="1"  Margin="0,0,25,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition/>
@@ -223,24 +223,27 @@
                     <StackPanel HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Bottom" Orientation="Horizontal">
                         <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE100;" Click="PreviousMusic"/>
 
-                        <Button x:Name="musicPlayPauseButton" Content="&#xE102;" Margin="6,0,6,0" Style="{StaticResource ButtonFontIconStyle}" Click="musicPlayPauseButton_Click">
+                        <Button x:Name="musicPlayPauseButton" Margin="6,0,6,0" Style="{StaticResource ButtonFontIconStyle}" Click="musicPlayPauseButton_Click">
                             <Button.KeyboardAccelerators>
                                 <KeyboardAccelerator Modifiers="None" Key="Space"/>
                                 <KeyboardAccelerator Modifiers="Control" Key="P"/>
                             </Button.KeyboardAccelerators>
+                            <FontIcon FontSize="20" Glyph="{x:Bind appInfomation.NowPlayingButtonIconGlyph,Mode=OneWay}"/>
                         </Button>
 
                         <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE101;" Click="NextMusic"/>
 
                         <ToggleButton x:Name="shuffleMusicToggleButton" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource musicControlToggleButtonStyle}"/>
 
-                        <ToggleButton x:Name="repeatMusicButton" IsThreeState="True" Click="RepeatMusic" Content="&#xE1CD;" Margin="0,0,6,0" Style="{StaticResource musicControlToggleButtonStyle}"/>
+                        <ToggleButton x:Name="repeatMusicButton" IsThreeState="True" Click="RepeatMusic" Margin="0,0,6,0" Style="{StaticResource musicControlToggleButtonStyle}">
+                            <FontIcon FontSize="20" Glyph="{x:Bind appInfomation.RepeatMusicButtonIconGlyph,Mode=OneWay}"/>
+                        </ToggleButton>
 
-                        <Button Content="{x:Bind volumeGlyphState.NowPlayingVolumeGlyph,Mode=OneWay}" FontSize="20" x:Name="volumeButton" Style="{StaticResource ButtonFontIconStyle}">
+                        <Button Content="{x:Bind volumeGlyphState.VolumeGlyph,Mode=OneWay}" FontSize="20" x:Name="volumeButton" Style="{StaticResource ButtonFontIconStyle}">
                             <Button.Flyout>
                                 <Flyout>
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Height="35" Width="35" FontSize="16" x:Name="muteButton" FontFamily="Segoe MDL2 Assets" Content="{x:Bind volumeGlyphState.NowPlayingVolumeGlyph1,Mode=OneWay}" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
+                                        <Button Height="35" Width="35" FontSize="16" x:Name="muteButton" FontFamily="Segoe MDL2 Assets" Content="{x:Bind volumeGlyphState.VolumeGlyph,Mode=OneWay}" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
                                         <Slider x:Name="volumeSlider" Width="100" ValueChanged="VolumeChanged" Value="{x:Bind musicInfomation.VolumeInSliderProperties,Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                     </StackPanel>
                                 </Flyout>

@@ -153,21 +153,20 @@ namespace Live_Music.Services
         /// <summary>
         /// 控制是否循环播放
         /// </summary>
-        /// <param name="IsRepeating">用于判断是否执行某些操作的值,若值为true,则关闭循环播放,若为false,则启用全部循环,若为null,则会单曲循环</param>
+        /// <param name="IsRepeating">用于判断是否执行某些操作的值,若值为true,则启用全部循环,若为false,则关闭循环播放,若为null,则会单曲循环</param>
         public void RepeatMusic(bool? IsRepeating)
         {
             switch (IsRepeating)
             {
                 case true:
-                    mediaPlaybackList.AutoRepeatEnabled = false;
+                    mediaPlaybackList.AutoRepeatEnabled = true;
                     mediaPlayer.IsLoopingEnabled = false;
                     break;
                 case false:
-                    mediaPlaybackList.AutoRepeatEnabled = true;
+                    mediaPlaybackList.AutoRepeatEnabled = mediaPlayer.IsLoopingEnabled = false;
                     break;
                 case null:
-                    mediaPlaybackList.AutoRepeatEnabled = true;
-                    mediaPlayer.IsLoopingEnabled = true;
+                    mediaPlaybackList.AutoRepeatEnabled = mediaPlayer.IsLoopingEnabled = true;
                     break;
                 default:
                     break;

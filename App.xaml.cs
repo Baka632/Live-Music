@@ -33,6 +33,7 @@ using Windows.UI.Core;
 using System.Text;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Windows.Devices.Portable;
 
 namespace Live_Music
 {
@@ -55,7 +56,7 @@ namespace Live_Music
             //进入或退出后台时进行管理
             this.EnteredBackground += AppEnteredBackground;
             this.LeavingBackground += AppLeavingBackground;
-            
+
             MemoryManager.AppMemoryUsageLimitChanging += AppMemoryUsageLimitChanging; //内存限制改变时的操作
             MemoryManager.AppMemoryUsageIncreased += AppMemoryUsageIncreased; //内存增加到上限值时的操作
 
@@ -84,12 +85,7 @@ namespace Live_Music
 #endif
         }
 
-        private void NotifyMainPage()
-        {
-            throw new NotImplementedException();
-        }
-
-        delegate void UnhandledExceptionHappened();
+        private delegate void UnhandledExceptionHappened();
         /// <summary>
         /// 应用程序设置的实例
         /// </summary>
@@ -117,7 +113,7 @@ namespace Live_Music
         /// <summary>
         /// 异常的详细信息
         /// </summary>
-        public static string[] UnhandledExceptionMessage = {"FullName","Message","StackTrace"};
+        public static string[] UnhandledExceptionMessage = { "FullName", "Message", "StackTrace" };
         /// <summary>
         /// 此值指示未处理的异常是否出现了三次
         /// </summary>
@@ -125,7 +121,7 @@ namespace Live_Music
         /// <summary>
         /// 此值指示应用是否在后台模式
         /// </summary>
-        bool IsInBackgroundMode;
+        private bool IsInBackgroundMode;
         private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
 
         /// <summary>
@@ -136,10 +132,11 @@ namespace Live_Music
         private void AppExceptionHandler(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
+            appInfomation.IsInfoBarButtonShow = Visibility.Visible;
             appInfomation.InfoBarTitle = "应用程序出现了一个异常";
             appInfomation.InfoBarMessage = "您可以向我们报告,也可以忽略该错误。";
             appInfomation.InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-            appInfomation.InfoBarButtonClick = (object sender1,RoutedEventArgs e1) => OpenExceptionDialog(e);
+            appInfomation.InfoBarButtonClick = (object sender1, RoutedEventArgs e1) => OpenExceptionDialog(e);
             appInfomation.IsInfoBarOpen = true;
         }
 
@@ -263,7 +260,7 @@ namespace Live_Music
         public void ReduceMemoryUsage()
         {
             Debug.WriteLine("[MemoryUsage]正在尝试减少应用内存使用量");
-            if (IsInBackgroundMode==true && Window.Current.Content != null)
+            if (IsInBackgroundMode == true && Window.Current.Content != null)
             {
                 Debug.WriteLine("[MemoryUsage]正在卸载主页面内容");
                 Window.Current.Content = null;
@@ -320,7 +317,7 @@ namespace Live_Music
                     BindingGeneric = new ToastBindingGeneric()
                     {
                         Children =
-            {
+                    {
                 new AdaptiveText()
                 {
                     Text = "非常抱歉"
@@ -347,7 +344,7 @@ namespace Live_Music
 
             if (rootFrame == null)
             {
-                return; 
+                return;
             }
 
             //当可以返回到上一个页面,且返回事件尚未被处理时发生
@@ -463,20 +460,100 @@ namespace Live_Music
         /// <param name="args"></param>
         protected override void OnFileActivated(FileActivatedEventArgs args)
         {
-            List<StorageFile> storageFiles = new List<StorageFile>();
-            foreach (var item in args.Files)
+            if (args.Verb == "playMusic")
             {
-                storageFiles.Add((StorageFile)item);
+                IReadOnlyList<StorageFile> fileList = (from StorageFile file in args.Files where IsMusicFile(file) select file).AsParallel().ToList();
+                if (!(Window.Current.Content is Frame frame))
+                {
+                    frame = new Frame();
+                    Window.Current.Content = frame;
+                }
+                frame.Navigate(typeof(MainPage), fileList);
             }
-            IReadOnlyList<StorageFile> file = storageFiles;
-            Frame frame = Window.Current.Content as Frame;
-            if (frame == null)
+            else
             {
-                frame = new Frame();
-                Window.Current.Content = frame;
+                List<StorageFile> storageFiles = new List<StorageFile>();
+                foreach (var item in args.Files)
+                {
+                    storageFiles.Add((StorageFile)item);
+                }
+                IReadOnlyList<StorageFile> file = storageFiles;
+                if (!(Window.Current.Content is Frame frame))
+                {
+                    frame = new Frame();
+                    Window.Current.Content = frame;
+                    frame.Navigate(typeof(MainPage), file);
+                }
             }
-            frame.Navigate(typeof(MainPage), file);
             Window.Current.Activate();
+            base.OnFileActivated(args);
+
+            bool IsMusicFile(StorageFile file)
+            {
+                switch (file.ContentType)
+                {
+                    case "audio/mpeg":
+                        return true;
+                    case "audio/x-wav":
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        protected override async void OnActivated(IActivatedEventArgs args)
+        {
+            if (args.Kind == ActivationKind.Device)
+            {
+                Frame rootFrame = null;
+                if (Window.Current.Content == null)
+                {
+                    rootFrame = new Frame();
+                    rootFrame.Navigate(typeof(MainPage));
+                    Window.Current.Content = rootFrame;
+                }
+                else
+                {
+                    rootFrame = Window.Current.Content as Frame;
+                }
+
+                bool storageDeviceAPIPresent = Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Devices.Portable.StorageDevice");
+                if (storageDeviceAPIPresent)
+                {
+                    var deviceArgs = args as DeviceActivatedEventArgs;
+#if DEBUG
+                    Debug.WriteLine("[Info]启动了自动播放");
+                    Debug.WriteLine($"[Info]激活类型{deviceArgs.Kind}");
+                    Debug.WriteLine($"[Info]设备标识符{deviceArgs.DeviceInformationId}");
+#endif
+                    IReadOnlyList<StorageFile> fileList = (from StorageFile file in await StorageDevice.FromId(deviceArgs.DeviceInformationId).GetItemsAsync() where IsMusicFile(file) select file).AsParallel().ToList();
+                    if (!(Window.Current.Content is Frame frame))
+                    {
+                        frame = new Frame();
+                        Window.Current.Content = frame;
+                    }
+                    frame.Navigate(typeof(MainPage), fileList);
+
+                    bool IsMusicFile(StorageFile file)
+                    {
+                        switch (file.ContentType)
+                        {
+                            case "audio/mpeg":
+                                return true;
+                            case "audio/x-wav":
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                }
+                else
+                {
+                    // Do nothing
+                }
+            }
+            base.OnActivated(args);
         }
     }
 }

@@ -17,7 +17,6 @@ namespace Live_Music.Helpers
         /// 访问本地设置的实例
         /// </summary>
         ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        ApplicationDataCompositeValue SuspendedData = new ApplicationDataCompositeValue();
         /// <summary>
         /// 主题设置的值
         /// </summary>

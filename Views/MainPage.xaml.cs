@@ -52,20 +52,23 @@ namespace Live_Music
         /// <summary>
         /// 磁贴助手的实例
         /// </summary>
-        TileHelper tileHelper = new TileHelper();
+        private TileHelper tileHelper = new TileHelper();
         /// <summary>
         /// 音乐信息的实例
         /// </summary>
-        MusicInfomation musicInfomation = App.musicInfomation;
+        private MusicInfomation musicInfomation = App.musicInfomation;
         /// <summary>
         /// 音乐服务的实例
         /// </summary>
-        MusicService musicService = App.musicService;
+        private MusicService musicService = App.musicService;
         /// <summary>
         /// 单个媒体播放项
         /// </summary>
-        MediaPlaybackItem mediaPlaybackItem;
-        AppInfomation appInfomation = App.appInfomation;
+        private MediaPlaybackItem mediaPlaybackItem;
+        /// <summary>
+        /// AppInfomation的实例
+        /// </summary>
+        private AppInfomation appInfomation = App.appInfomation;
         /// <summary>
         /// 指示内嵌的Frame是否能够返回
         /// </summary>
@@ -85,11 +88,11 @@ namespace Live_Music
         /// <summary>
         /// SMTC显示属性的实例
         /// </summary>
-        MediaItemDisplayProperties props;
+        private MediaItemDisplayProperties props;
         /// <summary>
         /// 声音图标状态的实例
         /// </summary>
-        VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
+        private VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -134,7 +137,7 @@ namespace Live_Music
         /// </summary>
         private static string[] supportedAudioFormats = new string[]
         {
-            ".mp3", ".wav", ".wma",".3g2", ".3gp2", ".3gp", ".3gpp", ".m4a", ".asf", ".aac", ".adt", ".adts", ".ac3", ".ec3",
+            ".mp3", ".wav", ".wma", ".aac", ".adt", ".adts", ".ac3", ".ec3",
         };
 
         /// <summary>
@@ -143,28 +146,28 @@ namespace Live_Music
         public MainPage()
         {
             this.InitializeComponent();
-            pausePlayingButton.IsEnabled = false;
-            stopPlayingButton.IsEnabled = false;
+            appInfomation.IsPlayerButtonEnabled = false;
 
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
             musicService.mediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
-            mediaControlStackPanel.Visibility = Visibility.Collapsed;
-            musicProcessStackPanel.Visibility = Visibility.Collapsed;
+            
 
             NavigationCacheMode = NavigationCacheMode.Required;
 
             mainContectFrame.Navigate(typeof(Views.FrameContect), null, new SuppressNavigationTransitionInfo());
-            processSlider.IsEnabled = false;
+            processSlider.IsEnabled = processSliderNarrow.IsEnabled = false;
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            processSlider.AddHandler(PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
-            processSlider.AddHandler(PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个函数处理*/, true /*如果在之前处理，是否还使用函数*/);
+            processSlider.AddHandler(PointerReleasedEvent , new PointerEventHandler(UIElement_OnPointerReleased) , true);
+            processSlider.AddHandler(PointerPressedEvent , new PointerEventHandler(UIElement_EnterPressedReleased) , true);
+            processSliderNarrow.AddHandler(PointerReleasedEvent, new PointerEventHandler(UIElement_OnPointerReleased) , true);
+            processSliderNarrow.AddHandler(PointerPressedEvent , new PointerEventHandler(UIElement_EnterPressedReleased) , true);
             if (musicService.mediaPlaybackList.CurrentItem == null)
             {
-                musicInfomationButton.Visibility = Visibility.Collapsed;
+                appInfomation.IsMusicPlayingControlVisible = Visibility.Collapsed;
             }
             ChangeNavgationViewSelectItem();
         }
@@ -187,7 +190,7 @@ namespace Live_Music
         private void UIElement_OnPointerReleased(object sender, PointerRoutedEventArgs e)
         {
             musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(SliderNewValue);
-            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            appInfomation.MusicNowPlayingTimeTextBlockText = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
             IsPointerEntered = false;
         }
 
@@ -200,8 +203,8 @@ namespace Live_Music
         {
             if (IsPointerEntered == false)
             {
-                processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
-                musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+                processSlider.Value = processSliderNarrow.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
+                appInfomation.MusicNowPlayingTimeTextBlockText = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
             }
         }
 
@@ -244,7 +247,7 @@ namespace Live_Music
             SliderNewValue = e.NewValue;
             if (IsPointerEntered)
             {
-                musicNowPlayingTimeTextBlock.Text = TimeSpan.FromSeconds(e.NewValue).ToString(@"m\:ss");
+                appInfomation.MusicNowPlayingTimeTextBlockText = TimeSpan.FromSeconds(e.NewValue).ToString(@"m\:ss");
             }
         }
 
@@ -293,20 +296,20 @@ namespace Live_Music
         /// <param name="e"></param>
         private void RepeatMusic(object sender, RoutedEventArgs e)
         {
-            switch (repeatMusicButton.IsChecked)
+            switch ((sender as ToggleButton)?.IsChecked)
             {
                 case true:
-                    musicService.RepeatMusic(false);
+                    musicService.RepeatMusic(true);
                     RepeatingMusicProperties = "循环播放:全部循环";
                     break;
                 case false:
-                    musicService.RepeatMusic(true);
-                    repeatMusicButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE1CD", FontSize = 16 };
+                    musicService.RepeatMusic(false);
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
                     RepeatingMusicProperties = "循环播放:关闭循环";
                     break;
                 case null:
                     musicService.RepeatMusic(null);
-                    repeatMusicButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE1CC", FontSize = 16 };
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CC";
                     RepeatingMusicProperties = "循环播放:单曲循环";
                     break;
                 default:
@@ -326,7 +329,7 @@ namespace Live_Music
                 case MediaPlaybackState.Playing:
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        pausePlayingButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = 27 };
+                        appInfomation.NowPlayingButtonIconGlyph = "\uE103";
                         NowPlayingProperties = "暂停";
                         if (dispatcherTimer.IsEnabled == false)
                         {
@@ -337,13 +340,13 @@ namespace Live_Music
                 case MediaPlaybackState.Paused:
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        pausePlayingButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = 27 };
+                        appInfomation.NowPlayingButtonIconGlyph = "\uE102";
                         NowPlayingProperties = "播放";
                         if (musicService.mediaPlaybackList.Items.Count == musicService.mediaPlaybackList.CurrentItemIndex + 1 && (int)processSlider.Value == (int)processSlider.Maximum)
                         {
                             dispatcherTimer.Stop();
-                            musicNowPlayingTimeTextBlock.Text = "0:00";
-                            processSlider.Value = 0;
+                            appInfomation.MusicNowPlayingTimeTextBlockText = "0:00";
+                            processSlider.Value = processSliderNarrow.Value = 0;
                         }
                     });
                     break;
@@ -394,11 +397,11 @@ namespace Live_Music
 
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    musicInfomationButton.Visibility = Visibility.Visible;
-                    processSlider.Maximum = musicInfomation.MusicDurationProperties;
-                    processSlider.IsEnabled = true;
-                    processSlider.Value = 0;
-                    musicNowPlayingTimeTextBlock.Text = "0:00";
+                    appInfomation.IsMusicPlayingControlVisible = Visibility.Visible;
+                    processSlider.Maximum = processSliderNarrow.Maximum = musicInfomation.MusicDurationProperties;
+                    processSlider.IsEnabled = processSliderNarrow.IsEnabled = true;
+                    processSlider.Value = processSliderNarrow.Value = 0;
+                    appInfomation.MusicNowPlayingTimeTextBlockText = "0:00";
                     dispatcherTimer.Start();
                 });
             }
@@ -407,7 +410,7 @@ namespace Live_Music
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     dispatcherTimer.Stop();
-                    musicInfomationButton.Visibility = Visibility.Collapsed;
+                    appInfomation.IsMusicPlayingControlVisible = Visibility.Collapsed;
                 });
                 tileHelper.DeleteTile();
             }
@@ -420,8 +423,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void StopMusic(object sender, RoutedEventArgs e)
         {
-            musicProcessStackPanel.Visibility = Visibility.Collapsed;
-            stopPlayingButton.IsEnabled = false;
+            musicProcessGrid.Visibility = Visibility.Collapsed;
             ChangeMusicControlButtonsUsableState();
             ResetMusicPropertiesList();
             musicService.StopMusic();
@@ -510,8 +512,7 @@ namespace Live_Music
                     musicService.mediaPlaybackList.Items.Clear();
                 }
                 PlayAndGetMusicProperites(fileList);
-                mediaControlStackPanel.Visibility = Visibility.Visible;
-                musicProcessStackPanel.Visibility = Visibility.Visible;
+                appInfomation.IsMediaControlVisible = Visibility.Visible;
             }
         }
 
@@ -530,13 +531,22 @@ namespace Live_Music
                 MusicPicker.FileTypeFilter.Add(fileExtension);
             }
 
-            IReadOnlyList<StorageFile> fileList = await MusicPicker.PickMultipleFilesAsync();
-
-            if (fileList.Count > 0)
+            try
             {
-                PlayAndGetMusicProperites(fileList);
-                mediaControlStackPanel.Visibility = Visibility.Visible;
-                musicProcessStackPanel.Visibility = Visibility.Visible;
+                IReadOnlyList<StorageFile> fileList = await MusicPicker.PickMultipleFilesAsync();
+                if (fileList.Count > 0)
+                {
+                    PlayAndGetMusicProperites(fileList);
+                    appInfomation.IsMediaControlVisible = Visibility.Visible;
+                }
+            }
+            catch (Exception ex) when(ex.HResult == -2147023170)
+            {
+                appInfomation.IsInfoBarButtonShow = Visibility.Collapsed;
+                appInfomation.InfoBarMessage = "请重新启动应用";
+                appInfomation.InfoBarTitle = "灾难性故障-打开文件夹失败";
+                appInfomation.InfoBarSeverity = muxc.InfoBarSeverity.Warning;
+                appInfomation.IsInfoBarOpen = true;
             }
         }
 
@@ -659,19 +669,13 @@ namespace Live_Music
         /// </summary>
         private void ChangeMusicControlButtonsUsableState()
         {
-            if (pausePlayingButton.IsEnabled == nextMusicButton.IsEnabled == previousMusicButton.IsEnabled == false)
+            if (appInfomation.IsPlayerButtonEnabled == false)
             {
-                pausePlayingButton.IsEnabled = true;
-                nextMusicButton.IsEnabled = true;
-                previousMusicButton.IsEnabled = true;
-                stopPlayingButton.IsEnabled = true;
+                appInfomation.IsPlayerButtonEnabled = true;
             }
             else
             {
-                stopPlayingButton.IsEnabled = false;
-                pausePlayingButton.IsEnabled = false;
-                nextMusicButton.IsEnabled = false;
-                previousMusicButton.IsEnabled = false;
+                appInfomation.IsPlayerButtonEnabled = false;
                 IsFirstTimeAddMusic = true;
             }
         }

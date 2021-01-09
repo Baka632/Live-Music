@@ -6,6 +6,9 @@ using Windows.UI.Xaml;
 
 namespace Live_Music
 {
+    /// <summary>
+    /// 为应用程序提供各种信息
+    /// </summary>
     public class AppInfomation : DependencyObject , INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -37,6 +40,38 @@ namespace Live_Music
         /// InfoBar严重性的值
         /// </summary>
         private Microsoft.UI.Xaml.Controls.InfoBarSeverity _InfoBarSeverity;
+        /// <summary>
+        /// 用以显示详细信息的委托的值
+        /// </summary>
+        private RoutedEventHandler _InfoBarButtonClick;
+        /// <summary>
+        /// 指示InfoBar的按钮是否显示的值
+        /// </summary>
+        private Visibility _IsInfoBarButtonShow;
+        /// <summary>
+        /// 有关正在播放的控件是否显示的值
+        /// </summary>
+        private Visibility _IsMusicPlayingControlVisible;
+        /// <summary>
+        /// 指示播放器的按钮是否显示的值
+        /// </summary>
+        private bool _IsPlayerButtonEnabled;
+        /// <summary>
+        /// 指示媒体控件是否显示的值
+        /// </summary>
+        private Visibility _IsMediaControlVisible;
+        /// <summary>
+        /// 正在播放音乐的进度的值
+        /// </summary>
+        private string _MusicNowPlayingTimeTextBlockText;
+        /// <summary>
+        /// "正在播放"按钮的图标的值
+        /// </summary>
+        private string _NowPlayingButtonIconGlyph = "\uE102";
+        /// <summary>
+        /// "循环播放"按钮的图标的值
+        /// </summary>
+        private string _RepeatMusicButtonIconGlyph = "\uE1CD";
 
         /// <summary>
         /// 指示InfoBar是否打开的属性
@@ -90,14 +125,106 @@ namespace Live_Music
             }
         }
 
-        private RoutedEventHandler _InfoBarButtonClick;
-
+        /// <summary>
+        /// InfoBar打开详细信息所用委托的属性
+        /// </summary>
         public RoutedEventHandler InfoBarButtonClick
         {
             get => _InfoBarButtonClick;
             set 
             { 
                 _InfoBarButtonClick = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// InfoBar的按钮是否显示的属性
+        /// </summary>
+        public Visibility IsInfoBarButtonShow
+        {
+            get => _IsInfoBarButtonShow;
+            set 
+            { 
+                _IsInfoBarButtonShow = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// 有关正在播放的控件是否显示的属性
+        /// </summary>
+        public Visibility IsMusicPlayingControlVisible
+        {
+            get => _IsMusicPlayingControlVisible;
+            set 
+            { 
+                _IsMusicPlayingControlVisible = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// 播放器按钮是否显示的属性
+        /// </summary>
+        public bool IsPlayerButtonEnabled
+        {
+            get => _IsPlayerButtonEnabled;
+            set 
+            {
+                _IsPlayerButtonEnabled = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// 媒体控件是否显示的属性
+        /// </summary>
+        public Visibility IsMediaControlVisible
+        {
+            get => _IsMediaControlVisible;
+            set 
+            { 
+                _IsMediaControlVisible = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// 正在播放音乐的进度的属性
+        /// </summary>
+        public string MusicNowPlayingTimeTextBlockText
+        {
+            get => _MusicNowPlayingTimeTextBlockText;
+            set 
+            { 
+                _MusicNowPlayingTimeTextBlockText = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// "正在播放"按钮的图标的属性
+        /// </summary>
+        public string NowPlayingButtonIconGlyph
+        {
+            get => _NowPlayingButtonIconGlyph;
+            set 
+            { 
+                _NowPlayingButtonIconGlyph = value;
+                OnPropertiesChanged();
+            }
+        }
+        
+        /// <summary>
+        /// "重复播放"按钮的图标的属性
+        /// </summary>
+        public string RepeatMusicButtonIconGlyph
+        {
+            get => _RepeatMusicButtonIconGlyph;
+            set 
+            {
+                _RepeatMusicButtonIconGlyph = value;
                 OnPropertiesChanged();
             }
         }

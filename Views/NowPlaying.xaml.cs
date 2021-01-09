@@ -35,6 +35,7 @@ namespace Live_Music.Views
         /// 音乐服务的实例
         /// </summary>
         MusicService musicService = App.musicService;
+        AppInfomation appInfomation = new AppInfomation();
         /// <summary>
         /// 页面上按钮中的FontIcon字号的大小,该字段为常量
         /// </summary>
@@ -59,10 +60,10 @@ namespace Live_Music.Views
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
                 case MediaPlaybackState.Playing:
-                    musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = PlayPauseButtonFontSize };
+                    appInfomation.NowPlayingButtonIconGlyph = "\uE103";
                     break;
                 case MediaPlaybackState.Paused:
-                    musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = PlayPauseButtonFontSize };
+                    appInfomation.NowPlayingButtonIconGlyph = "\uE102";
                     break;
                 default:
                     ChangeMusicPlayerVisibility(musicService.mediaPlayer.PlaybackSession.PlaybackState);
@@ -172,18 +173,18 @@ namespace Live_Music.Views
                 case MediaPlaybackState.Buffering:
                     break;
                 case MediaPlaybackState.Playing:
+                    appInfomation.NowPlayingButtonIconGlyph = "\uE103";
                     ChangeMusicPlayerVisibility(MediaPlaybackState.Playing);
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE103", FontSize = PlayPauseButtonFontSize };
                         MainPage.dispatcherTimer.Start();
                     });
                     break;
                 case MediaPlaybackState.Paused:
                     ChangeMusicPlayerVisibility(MediaPlaybackState.Paused);
+                    appInfomation.NowPlayingButtonIconGlyph = "\uE102";
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        musicPlayPauseButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE102", FontSize = PlayPauseButtonFontSize };
                         if (musicService.mediaPlaybackList.Items.Count == musicService.mediaPlaybackList.CurrentItemIndex + 1 && (int)processSlider.Value == (int)processSlider.Maximum)
                         {
                             MainPage.dispatcherTimer.Stop();
@@ -252,15 +253,15 @@ namespace Live_Music.Views
             switch (repeatMusicButton.IsChecked)
             {
                 case true:
-                    musicService.RepeatMusic(false);
+                    musicService.RepeatMusic(true);
                     break;
                 case false:
-                    musicService.RepeatMusic(true);
-                    repeatMusicButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE1CD", FontSize = PlayPauseButtonFontSize };
+                    musicService.RepeatMusic(false);
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
                     break;
                 case null:
                     musicService.RepeatMusic(null);
-                    repeatMusicButton.Content = new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE1CC", FontSize = PlayPauseButtonFontSize };
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CC";
                     break;
                 default:
                     break;

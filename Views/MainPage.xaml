@@ -20,7 +20,7 @@
                 <Setter Property="Height" Value="35"/>
                 <Setter Property="Width" Value="35"/>
             </Style>
-            <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="#434343"/>
+            <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"/>
             <Style x:Key="ToggleButtonRevealStyle" TargetType="ToggleButton">
                 <Setter Property="Background" Value="{ThemeResource ToggleButtonRevealBackground}"/>
                 <Setter Property="Foreground" Value="{ThemeResource ToggleButtonForeground}"/>
@@ -179,8 +179,7 @@
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
-
-        <NavigationView Background="{StaticResource SystemControlAltMediumLowAcrylicElementMediumBrush}" x:Name="mainPageNavigtationView" IsBackEnabled="{x:Bind ContentFrameCanGoBack,Mode=OneWay}" BackRequested="mainPageNavigtationView_BackRequested" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <NavigationView PaneDisplayMode="Top" Background="{ThemeResource SystemControlAcrylicElementMediumHighBrush}" x:Name="mainPageNavigtationView" IsBackEnabled="{x:Bind ContentFrameCanGoBack,Mode=OneWay}" BackRequested="mainPageNavigtationView_BackRequested" ItemInvoked="mainPageNavigtationView_ItemInvoked" DisplayModeChanged="mainPageNavigtationView_DisplayModeChanged" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <NavigationView.Resources>
                 <Style TargetType="muxc:NavigationViewItem" x:Name="mainPageNavigtationViewItemsStyle">
                     <Setter Property="Height" Value="20"/>
@@ -208,16 +207,16 @@
             </NavigationView.MenuItems>
 
             <NavigationView.AutoSuggestBox>
-                <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search" CornerRadius="0" Height="35" PlaceholderText="搜索" BorderBrush="Black"/>
+                <AutoSuggestBox x:Name="searchAutoSuggestBox" QueryIcon="Find" AutomationProperties.Name="Search" CornerRadius="0" Height="35" Width="180" PlaceholderText="搜索" BorderBrush="Gray"/>
             </NavigationView.AutoSuggestBox>
 
             <Frame x:Name="mainContectFrame"/>
 
         </NavigationView>
 
-        <Grid HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
+        <Grid x:Name="wideNowPlayingGrid" HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
             <Grid.Background>
-                <AcrylicBrush x:Name="musicNowPlayingGridAcrylicBrush"
+                <AcrylicBrush
                         BackgroundSource="Backdrop"
                         TintColor="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"
                         TintOpacity="0.5"
@@ -229,7 +228,6 @@
                 <ColumnDefinition Width="*" MaxWidth="282"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="6"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -254,58 +252,85 @@
                 </Style>
             </Grid.Resources>
 
-            <Button x:Name="musicInfomationButton" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="350" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.RowSpan="2">
+            <Button CanDrag="True" Visibility="{x:Bind appInfomation.IsMusicPlayingControlVisible,Mode=OneWay}" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="250" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image x:Name="musicImage" Grid.Column="0" Margin="0,0,10,0" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
+                    <Image Grid.Column="0" Margin="0,0,10,0" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
                     <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Grid.RowDefinitions>
-                            <RowDefinition/>
+                            <RowDefinition Height="auto"/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock x:Name="musicName" Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontSize="18" Grid.Row="0"/>
-                        <TextBlock x:Name="musicAlbumArtist" Margin="0,0,0,5" Grid.Row="1" Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontSize="18" Grid.Row="0"/>
+                        <TextBlock Margin="0,0,0,5" Grid.Row="1" Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontWeight="Bold" FontSize="16"/>
                     </Grid>
                 </Grid>
             </Button>
 
-            <StackPanel Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal" x:Name="mediaControlStackPanel">
-                <ToggleButton x:Name="shuffleMusicToggleButton" ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
+            <Grid Visibility="{x:Bind appInfomation.IsMediaControlVisible,Mode=OneWay}" Grid.RowSpan="2" Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="52"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-                <Button x:Name="previousMusicButton" Click="PreviousMusic" Content="&#xE100;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleButton ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
 
-                <Button x:Name="pausePlayingButton" ToolTipService.ToolTip="{x:Bind NowPlayingProperties,Mode=OneWay}" FontSize="27" Content="&#xE102;" Click="PlayPauseMusic" Margin="6,0,6,0" Style="{StaticResource musicControlButtonStyle}" BorderBrush="#9f9f9f" BorderThickness="2">
-                    <Button.KeyboardAccelerators>
-                        <KeyboardAccelerator Modifiers="None" Key="Space"/>
-                        <KeyboardAccelerator Modifiers="Control" Key="P"/>
-                    </Button.KeyboardAccelerators>
-                </Button>
+                    <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="PreviousMusic" Content="&#xE100;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
 
-                <Button x:Name="nextMusicButton" Click="NextMusic" Content="&#xE101;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
+                    <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" ToolTipService.ToolTip="{x:Bind NowPlayingProperties,Mode=OneWay}" FontSize="27" Click="PlayPauseMusic" Margin="6,0,6,0" Style="{StaticResource musicControlButtonStyle}" BorderBrush="#9f9f9f" BorderThickness="2">
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                            <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                        </Button.KeyboardAccelerators>
+                        <FontIcon FontSize="27" Glyph="{x:Bind appInfomation.NowPlayingButtonIconGlyph,Mode=OneWay}"/>
+                    </Button>
 
-                <ToggleButton x:Name="repeatMusicButton" ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Content="&#xE1CD;" Style="{StaticResource musicControlToggleButtonStyle}"/>
-            </StackPanel>
+                    <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="NextMusic" Content="&#xE101;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
 
+                    <ToggleButton ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Style="{StaticResource musicControlToggleButtonStyle}">
+                        <FontIcon FontSize="16" Glyph="{x:Bind appInfomation.RepeatMusicButtonIconGlyph,Mode=OneWay}"/>
+                    </ToggleButton>
+                </StackPanel>
+            </Grid>
+            
+            <Grid x:Name="musicProcessGrid" Grid.Column="1" MaxWidth="420" Visibility="{x:Bind appInfomation.IsMediaControlVisible,Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Height="35" Width="35" x:Name="muteButton" Content="{x:Bind volumeGlyphState.VolumeGlyph,Mode=OneWay}" CornerRadius="25" HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
-
-                <Slider x:Name="volumeSlider" Width="100" ValueChanged="VolumeChanged" Value="{x:Bind musicInfomation.VolumeInSliderProperties,Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock Text="{x:Bind appInfomation.MusicNowPlayingTimeTextBlockText,Mode=OneWay}" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Margin="5,0,5,0" HorizontalAlignment="Stretch" Grid.Column="1" x:Name="processSlider" Value="{x:Bind musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds,Mode=OneWay}" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
+                <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" Grid.Column="2" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+            
+            <StackPanel Grid.Column="2" Margin="0,6,0,0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,5,0" Orientation="Horizontal">
+                    <Button Height="35" Width="35" CornerRadius="25" HorizontalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
+                        <FontIcon FontSize="16" Glyph="{x:Bind volumeGlyphState.VolumeGlyph,Mode=OneWay}"/>
+                    </Button>
+                    <Slider Width="100" ValueChanged="VolumeChanged" Value="{x:Bind musicInfomation.VolumeInSliderProperties,Mode=OneWay}" HorizontalAlignment="Center"/>
+                </StackPanel>
 
                 <Button x:Name="enterCompactOverlayModeButton" ToolTipService.ToolTip="进入最小模式" Click="EnterCompactOverlayMode" Margin="5,0,5,0" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#xE158;" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}"/>
 
-                <Button x:Name="openMusicButton" Click="OpenMusicFile" Content="&#xE1A5;" Style="{StaticResource ButtonFontIconStyle}" Margin="0,0,5,0"/>
+                <Button Click="OpenMusicFile" Content="&#xE1A5;" Style="{StaticResource ButtonFontIconStyle}" Margin="0,0,5,0"/>
 
-                <Button x:Name="moreOptionsFlyoutButton" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Content="&#xE10C;" Grid.Column="2" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
+                <Button Margin="0,0,6,0" Padding="0" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2" CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
+                    <Button.Content>
+                        <FontIcon x:Name="moreOptionsFlyoutFontIcon" Glyph="&#xE10C;"/>
+                    </Button.Content>
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel>
-                                <Button x:Name="stopPlayingButton" Click="StopMusic" CornerRadius="0" Background="Transparent" Style="{StaticResource ButtonRevealStyle}">
+                                <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="StopMusic" CornerRadius="0" Background="Transparent">
                                     <StackPanel Orientation="Horizontal">
                                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" Margin="0,0,5,0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         <TextBlock Text="清空&quot;正在播放&quot;列表" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -316,13 +341,129 @@
                     </Button.Flyout>
                 </Button>
             </StackPanel>
+        </Grid>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" x:Name="musicProcessStackPanel" Margin="0,5,0,0">
-                <TextBlock x:Name="musicNowPlayingTimeTextBlock" Text="0:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
-                <Slider Width="350" Margin="5,0,5,0" x:Name="processSlider" IsThumbToolTipEnabled="False" IsEnabled="False" ValueChanged="processSlider_ValueChanged"/>
-                <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" Foreground="White"/>
+        <Grid x:Name="narrowNowPlayingGrid" HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
+            <Grid.Background>
+                <AcrylicBrush
+                        BackgroundSource="Backdrop"
+                        TintColor="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"
+                        TintOpacity="0.5"
+                        AlwaysUseFallback="False"
+                    />
+            </Grid.Background>
+
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="35"/>
+            </Grid.RowDefinitions>
+
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource ButtonFontIconStyle}" x:Key="musicControlButtonStyle">
+                    <Setter Property="Height" Value="51"/>
+                    <Setter Property="Width" Value="51"/>
+                </Style>
+                <Style TargetType="ToggleButton" x:Key="musicControlToggleButtonStyle" BasedOn="{StaticResource ToggleButtonRevealStyle}">
+                    <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="Height" Value="37"/>
+                    <Setter Property="Width" Value="37"/>
+                    <Setter Property="Margin" Value="5,0,5,0"/>
+                    <Setter Property="CornerRadius" Value="25"/>
+                </Style>
+            </Grid.Resources>
+
+            <Button CanDrag="True" Visibility="{x:Bind appInfomation.IsMusicPlayingControlVisible,Mode=OneWay}" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="230" VerticalAlignment="Stretch" Background="Transparent" CornerRadius="0">
+                <Grid Margin="15,0,15,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontSize="18" Grid.Row="0"/>
+                    <TextBlock Grid.Row="1" Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" FontWeight="Bold" FontSize="16"/>
+                </Grid>
+            </Button>
+
+            <StackPanel Visibility="{x:Bind appInfomation.IsMediaControlVisible,Mode=OneWay}" Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+                <ToggleButton ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
+
+                <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="PreviousMusic" Content="&#xE100;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
+
+                <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" ToolTipService.ToolTip="{x:Bind NowPlayingProperties,Mode=OneWay}" FontSize="27" Click="PlayPauseMusic" Margin="6,0,6,0" Style="{StaticResource musicControlButtonStyle}" BorderBrush="#9f9f9f" BorderThickness="2">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="None" Key="Space"/>
+                        <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                    </Button.KeyboardAccelerators>
+                    <FontIcon FontSize="27" Glyph="{x:Bind appInfomation.NowPlayingButtonIconGlyph,Mode=OneWay}"/>
+                </Button>
+
+                <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="NextMusic" Content="&#xE101;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
+
+                <ToggleButton ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Style="{StaticResource musicControlToggleButtonStyle}">
+                    <FontIcon FontSize="16" Glyph="{x:Bind appInfomation.RepeatMusicButtonIconGlyph,Mode=OneWay}"/>
+                </ToggleButton>
+
+                <Button Margin="0,0,6,0" Padding="0" Height="35" Width="35" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"  CornerRadius="25" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
+                    <Button.Content>
+                        <FontIcon Glyph="&#xE10C;" FontSize="16"/>
+                    </Button.Content>
+                    <Button.Flyout>
+                        <Flyout>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                    <Button Height="35" Width="35" CornerRadius="25" HorizontalAlignment="Center" Click="MuteMusic" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource ButtonFontIconStyle}">
+                                        <FontIcon FontSize="16" Glyph="{x:Bind volumeGlyphState.VolumeGlyph,Mode=OneWay}"/>
+                                    </Button>
+                                    <Slider Width="100" ValueChanged="VolumeChanged" Value="{x:Bind musicInfomation.VolumeInSliderProperties,Mode=OneWay}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Button Margin="0,5,0,5" HorizontalAlignment="Stretch" Grid.Row="1" ToolTipService.ToolTip="进入最小模式" Click="EnterCompactOverlayMode" Background="Transparent">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE158;" Margin="0,0,5,0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="进入最小模式" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button HorizontalAlignment="Stretch" Grid.Row="2" Click="OpenMusicFile" Background="Transparent">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE1A5;" Margin="0,0,5,0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="打开音乐文件" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button HorizontalAlignment="Stretch" Grid.Row="3" IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="StopMusic" Background="Transparent">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE106;" Margin="0,0,5,0" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="清空&quot;正在播放&quot;列表" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
             </StackPanel>
 
+            <Grid Visibility="{x:Bind appInfomation.IsMediaControlVisible,Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{x:Bind appInfomation.MusicNowPlayingTimeTextBlockText,Mode=OneWay}" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Slider Margin="5,0,5,0" HorizontalAlignment="Stretch" Grid.Column="1" x:Name="processSliderNarrow" Value="{x:Bind musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds,Mode=OneWay}" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
+                <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" Grid.Column="2" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
         </Grid>
 
         <Grid x:Name="superButtonGrid" HorizontalAlignment="Right" VerticalAlignment="Stretch" MaxWidth="210" Grid.Row="0" Width="50" Visibility="Collapsed" PointerExited="HideSuperButton" Background="{ThemeResource SystemControlAcrylicElementBrush}">
@@ -399,10 +540,34 @@
             Title="{x:Bind appInfomation.InfoBarTitle,Mode=OneWay}"
             Message="{x:Bind appInfomation.InfoBarMessage,Mode=OneWay}" >
             <muxc:InfoBar.ActionButton>
-                <Button Content="显示详细信息" Click="{x:Bind appInfomation.InfoBarButtonClick,Mode=OneWay}" />
+                <Button Visibility="{x:Bind appInfomation.IsInfoBarButtonShow,Mode=OneWay}" Content="显示详细信息" Click="{x:Bind appInfomation.InfoBarButtonClick,Mode=OneWay}" />
             </muxc:InfoBar.ActionButton>
         </muxc:InfoBar>
 
         <TextBlock x:Name="titleTextBlock" Text="Live Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
+        
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Tablet">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="760"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="wideNowPlayingGrid.Visibility" Value="Visible"/>
+                        <Setter Target="narrowNowPlayingGrid.Visibility" Value="Collapsed"/>
+                    </VisualState.Setters>
+                </VisualState>
+                
+                <VisualState x:Name="Phone">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="wideNowPlayingGrid.Visibility" Value="Collapsed"/>
+                        <Setter Target="narrowNowPlayingGrid.Visibility" Value="Visible"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>
