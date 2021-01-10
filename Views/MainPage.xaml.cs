@@ -937,7 +937,6 @@ namespace Live_Music
                                         new AdaptiveText()
                                         {
                                             Text = musicInfomation.MusicAlbumProperties,
-                                            HintWrap = true
                                         },
                                         new AdaptiveText()
                                         {
