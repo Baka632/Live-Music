@@ -619,12 +619,14 @@ namespace Live_Music
                 string AlbumSaveName = musicProperties.Album;
                 AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
 
-                using (var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
+                Task task = new Task(async () => 
                 {
-                    Task task = new Task(async () => await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream));
-                    task.Start();
-                    task.Wait();
-                }
+                    var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg");
+                    await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
+                    fileStream.Dispose();
+                });
+                task.Start();
+                task.Wait();
                 SetTileSource();
             }
         }
@@ -1122,15 +1124,21 @@ namespace Live_Music
                 var items = await dataview.GetStorageItemsAsync();
                 if (items.Count > 0)
                 {
-                    List<StorageFile> files = (from IStorageItem file in items where file.IsOfType(StorageItemTypes.File) select file as StorageFile).ToList();
-                    if (files.Count > 0)
+                    await Task.Run(async () =>
                     {
-                        e.AcceptedOperation = DataPackageOperation.Copy;
-                    }
-                    else
-                    {
-                        e.AcceptedOperation = DataPackageOperation.None;
-                    }
+                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                         {
+                             List<StorageFile> files = (from IStorageItem file in items.AsParallel() where file.IsOfType(StorageItemTypes.File) select file as StorageFile).ToList();
+                             if (files.Count > 0)
+                             {
+                                 e.AcceptedOperation = DataPackageOperation.Copy;
+                             }
+                             else
+                             {
+                                 e.AcceptedOperation = DataPackageOperation.None;
+                             }
+                         });
+                    });
                 }
             }
             else
