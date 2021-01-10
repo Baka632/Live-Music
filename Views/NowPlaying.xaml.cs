@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Playback;
+using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -37,10 +39,6 @@ namespace Live_Music.Views
         MusicService musicService = App.musicService;
         AppInfomation appInfomation = new AppInfomation();
         /// <summary>
-        /// 页面上按钮中的FontIcon字号的大小,该字段为常量
-        /// </summary>
-        private const int PlayPauseButtonFontSize = 20;
-        /// <summary>
         /// 指示是否第一次进入页面
         /// </summary>
         bool IsFirstTimeEnterPage = true;
@@ -48,6 +46,8 @@ namespace Live_Music.Views
         /// 声音图标状态的实例
         /// </summary>
         VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
+        public delegate void NowPlayingDelegate(NowPlayingDragOverEventArgs args);
+        public static event NowPlayingDelegate NowPlayingDargOverEvent;
 
         /// <summary>
         /// 初始化NowPlaying类的新实例
@@ -94,7 +94,7 @@ namespace Live_Music.Views
         private void UIElement_OnPointerReleased(object sender, PointerRoutedEventArgs e)
         {
             musicService.mediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(MainPage.SliderNewValue);
-            musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+            appInfomation.MusicNowPlayingTimeTextBlockText = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
             MainPage.IsPointerEntered = false;
         }
 
@@ -108,7 +108,7 @@ namespace Live_Music.Views
             if (MainPage.IsPointerEntered == false)
             {
                 processSlider.Value = musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds;
-                musicNowPlayingTimeTextBlock.Text = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
+                appInfomation.MusicNowPlayingTimeTextBlockText = musicService.mediaPlayer.PlaybackSession.Position.ToString(@"m\:ss");
             }
         }
 
@@ -121,6 +121,7 @@ namespace Live_Music.Views
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
+                processSlider.Value = 0;
                 processSlider.Maximum = musicInfomation.MusicDurationProperties;
             });
         }
@@ -188,7 +189,6 @@ namespace Live_Music.Views
                         if (musicService.mediaPlaybackList.Items.Count == musicService.mediaPlaybackList.CurrentItemIndex + 1 && (int)processSlider.Value == (int)processSlider.Maximum)
                         {
                             MainPage.dispatcherTimer.Stop();
-                            musicNowPlayingTimeTextBlock.Text = "0:00";
                             processSlider.Value = 0;
                         }
                     });
@@ -291,6 +291,10 @@ namespace Live_Music.Views
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+            if (!(musicService.mediaPlaybackList.Items.Count > 0))
+            {
+                ChangeMusicPlayerVisibility(MediaPlaybackState.None);
+            }
             if (IsFirstTimeEnterPage)
             {
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -311,8 +315,62 @@ namespace Live_Music.Views
             MainPage.SliderNewValue = e.NewValue;
             if (MainPage.IsPointerEntered)
             {
-                musicNowPlayingTimeTextBlock.Text = TimeSpan.FromSeconds(e.NewValue).ToString(@"m\:ss");
+                appInfomation.MusicNowPlayingTimeTextBlockText = TimeSpan.FromSeconds(e.NewValue).ToString(@"m\:ss");
             }
         }
+
+        private async void MusicDragOver(object sender, DragEventArgs e)
+        {
+            var deferral = e.GetDeferral();
+            e.DragUIOverride.Caption = "播放";
+            DataPackageView dataview = e.DataView;
+            if (dataview.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await dataview.GetStorageItemsAsync();
+                if (items.Count > 0)
+                {
+                    List<StorageFile> files = (from IStorageItem file in items where file.IsOfType(StorageItemTypes.File) select file as StorageFile).ToList();
+                    if (files.Count > 0)
+                    {
+                        e.AcceptedOperation = DataPackageOperation.Copy;
+                    }
+                    else
+                    {
+                        e.AcceptedOperation = DataPackageOperation.None;
+                    }
+                }
+            }
+            else
+            {
+                e.AcceptedOperation = DataPackageOperation.None;
+            }
+            deferral.Complete();
+        }
+
+        private async void MusicDrop(object sender, DragEventArgs e)
+        {
+            var defer = e.GetDeferral();
+            try
+            {
+                DataPackageView dpv = e.DataView;
+                if (dpv.Contains(StandardDataFormats.StorageItems))
+                {
+                    IReadOnlyList<IStorageItem> files = await dpv.GetStorageItemsAsync();
+                    if (NowPlayingDargOverEvent != null)
+                    {
+                        NowPlayingDargOverEvent(new NowPlayingDragOverEventArgs() { Items = (from StorageFile file in files where file.ContentType == "audio/mpeg" && file.IsOfType(StorageItemTypes.File) select file).ToList() });
+                    }
+                }
+            }
+            finally
+            {
+                defer.Complete();
+            }
+        }
+    }
+
+    public class NowPlayingDragOverEventArgs : EventArgs
+    {
+        public IReadOnlyList<StorageFile> Items { get; set; }
     }
 }

@@ -37,6 +37,7 @@ namespace Live_Music.Services
             mediaPlayer.AutoPlay = true;
             mediaPlayer.AudioCategory = MediaPlayerAudioCategory.Media;
             mediaPlayer.Volume = App.musicInfomation.MusicVolumeProperties;
+            mediaPlaybackList.MaxPlayedItemsToKeepOpen = 5;
         }
 
         #region DisposeMusicService

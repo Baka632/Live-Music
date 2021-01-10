@@ -49,7 +49,6 @@ namespace Live_Music.Views
                     break;
             }
             MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick;
-            progressBar.Maximum = musicInfomation.MusicDurationProperties;
         }
 
         private void DispatcherTimer_Tick(object sender, object e)
@@ -123,5 +122,13 @@ namespace Live_Music.Views
         private void PreviousMusic(object sender, RoutedEventArgs e) => musicService.PreviousMusic();
 
         private void NextMusic(object sender, RoutedEventArgs e) => musicService.NextMusic();
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!(musicService.mediaPlaybackList.Items.Count > 0))
+            {
+                ChangeMusicPlayerVisibility(MediaPlaybackState.None);
+            }
+        }
     }
 }

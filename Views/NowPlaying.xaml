@@ -8,6 +8,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     RequestedTheme="Dark"
+    AllowDrop="True"
+    Drop="MusicDrop"
+    DragOver="MusicDragOver"
     Loaded="Page_Loaded">
     <Page.Resources>
         <SolidColorBrush x:Key="ToggleButtonUncheckedCheckedIndeterminateBackground" Color="{x:Bind musicInfomation.GridAcrylicBrushColorProperties,Mode=OneWay}"/>
@@ -215,7 +218,7 @@
                             <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="musicNowPlayingTimeTextBlock" Text="0:00" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="musicNowPlayingTimeTextBlock" Text="{x:Bind appInfomation.MusicNowPlayingTimeTextBlockText,Mode=OneWay}" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <Slider Margin="5,0,5,0" Grid.Column="1" x:Name="processSlider" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
                         <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" Grid.Column="2" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>

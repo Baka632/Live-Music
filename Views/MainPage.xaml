@@ -197,7 +197,7 @@
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81C;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="正在播放" x:Name="nowPlaying" Tag="nowPlaying">
+                <NavigationViewItem AllowDrop="True" DragOver="MusicDragOver" Drop="MusicDrop" Content="正在播放" x:Name="nowPlaying" Tag="nowPlaying">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE142;" />
                         <!--先凑合着用-->
@@ -207,14 +207,14 @@
             </NavigationView.MenuItems>
 
             <NavigationView.AutoSuggestBox>
-                <AutoSuggestBox x:Name="searchAutoSuggestBox" QueryIcon="Find" AutomationProperties.Name="Search" CornerRadius="0" Height="35" Width="180" PlaceholderText="搜索" BorderBrush="Gray"/>
+                <AutoSuggestBox x:Name="searchAutoSuggestBox" TextChanged="Search" QueryIcon="Find" AutomationProperties.Name="Search" CornerRadius="0" Height="35" Width="180" PlaceholderText="搜索" BorderBrush="Gray"/>
             </NavigationView.AutoSuggestBox>
 
             <Frame x:Name="mainContectFrame"/>
 
         </NavigationView>
 
-        <Grid x:Name="wideNowPlayingGrid" HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
+        <Grid x:Name="wideNowPlayingGrid" AllowDrop="True" Drop="MusicDrop" DragOver="MusicDragOver" HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
             <Grid.Background>
                 <AcrylicBrush
                         BackgroundSource="Backdrop"
@@ -252,7 +252,7 @@
                 </Style>
             </Grid.Resources>
 
-            <Button CanDrag="True" Visibility="{x:Bind appInfomation.IsMusicPlayingControlVisible,Mode=OneWay}" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="250" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
+            <Button x:Name="wideMusicButton" CanDrag="True" Visibility="{x:Bind appInfomation.IsMusicPlayingControlVisible,Mode=OneWay}" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="250" VerticalAlignment="Stretch" Grid.ColumnSpan="2" Background="Transparent" CornerRadius="0" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -343,7 +343,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid x:Name="narrowNowPlayingGrid" HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
+        <Grid x:Name="narrowNowPlayingGrid" AllowDrop="True" Drop="MusicDrop" DragOver="MusicDragOver" HorizontalAlignment="Stretch" RequestedTheme="Dark" Height="100" VerticalAlignment="Bottom" Grid.Row="1">
             <Grid.Background>
                 <AcrylicBrush
                         BackgroundSource="Backdrop"
@@ -375,7 +375,7 @@
                 </Style>
             </Grid.Resources>
 
-            <Button CanDrag="True" Visibility="{x:Bind appInfomation.IsMusicPlayingControlVisible,Mode=OneWay}" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="230" VerticalAlignment="Stretch" Background="Transparent" CornerRadius="0">
+            <Button AllowDrop="True" DragOver="MusicDragOver" Drop="MusicDrop" CanDrag="True" Visibility="{x:Bind appInfomation.IsMusicPlayingControlVisible,Mode=OneWay}" Padding="0" Click="EnterNowPlaying" Width="auto" MaxWidth="230" VerticalAlignment="Stretch" Background="Transparent" CornerRadius="0">
                 <Grid Margin="15,0,15,0">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -545,7 +545,7 @@
         </muxc:InfoBar>
 
         <TextBlock x:Name="titleTextBlock" Text="Live Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
-        
+
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState x:Name="Tablet">

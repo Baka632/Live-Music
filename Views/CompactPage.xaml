@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    RequestedTheme="Dark">
+    RequestedTheme="Dark"
+    Loaded="Page_Loaded">
     <Page.Resources>
         <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">
             <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
@@ -63,6 +64,6 @@
         </Grid>
         
         <Button x:Name="exitButton" Click="ExitCompactPageMode" Content="&#xE158;" FontSize="16" Style="{StaticResource ButtonFontIconStyle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,10"/>
-        <ProgressBar CornerRadius="0" x:Name="progressBar" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
+        <ProgressBar CornerRadius="0" x:Name="progressBar" Maximum="{x:Bind musicInfomation.MusicDurationProperties,Mode=OneWay}" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
     </Grid>
 </Page>
