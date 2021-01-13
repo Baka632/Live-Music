@@ -63,10 +63,6 @@ namespace Live_Music
         /// </summary>
         private MusicService musicService = App.musicService;
         /// <summary>
-        /// 单个媒体播放项
-        /// </summary>
-        private MediaPlaybackItem mediaPlaybackItem;
-        /// <summary>
         /// AppInfomation的实例
         /// </summary>
         private AppInfomation appInfomation = App.appInfomation;
@@ -86,10 +82,6 @@ namespace Live_Music
         /// 指示鼠标指针是否在拖动进度条的值
         /// </summary>
         public static bool IsPointerEntered = false;
-        /// <summary>
-        /// SMTC显示属性的实例
-        /// </summary>
-        private MediaItemDisplayProperties props;
         /// <summary>
         /// 声音图标状态的实例
         /// </summary>
@@ -390,15 +382,6 @@ namespace Live_Music
                 musicInfomation.MusicDurationProperties = MusicPropertiesList[CurrentItemIndex].Duration.TotalSeconds;
                 musicInfomation.MusicAlbumProperties = MusicPropertiesList[CurrentItemIndex].Album;
 
-                StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.GetFileAsync($"{musicInfomation.MusicAlbumProperties.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty)}.jpg");
-                props = mediaPlaybackItem.GetDisplayProperties();
-                props.Type = Windows.Media.MediaPlaybackType.Music;
-                props.MusicProperties.Title = musicInfomation.MusicTitleProperties;
-                props.MusicProperties.Artist = musicInfomation.MusicAlbumArtistProperties;
-                props.Thumbnail = RandomAccessStreamReference.CreateFromFile(storageFile);
-                props.MusicProperties.AlbumTitle = musicInfomation.MusicAlbumProperties;
-                mediaPlaybackItem.ApplyDisplayProperties(props);
-
                 SetTileSource();
 
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -560,12 +543,6 @@ namespace Live_Music
         /// <param name="file">传入的音乐文件</param>
         private void PlayAndGetMusicProperites(IReadOnlyList<StorageFile> fileList)
         {
-            for (int i = 0; i < fileList.Count; i++)
-            {
-                mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList[i]));
-                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
-            }
-
             if (IsFirstTimeAddMusic == true)
             {
                 musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
@@ -627,8 +604,17 @@ namespace Live_Music
                 });
                 task.Start();
                 task.Wait();
-                SetTileSource();
+                MediaPlaybackItem mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList[i]));
+                MediaItemDisplayProperties props = mediaPlaybackItem.GetDisplayProperties();
+                props.Type = Windows.Media.MediaPlaybackType.Music;
+                props.MusicProperties.Title = musicProperties.Title;
+                props.MusicProperties.Artist = musicProperties.Artist;
+                props.MusicProperties.AlbumTitle = musicProperties.AlbumArtist;
+                props.Thumbnail = RandomAccessStreamReference.CreateFromStream(musicThumbnailTask.Result);
+                mediaPlaybackItem.ApplyDisplayProperties(props);
+                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
             }
+            SetTileSource();
         }
 
         /// <summary>
