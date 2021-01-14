@@ -38,6 +38,7 @@ using Windows.Devices.Custom;
 using Live_Music.Views;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using System.Threading;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 //使用了Win2D,Microsoft Toolkit和Windows UI
@@ -86,6 +87,10 @@ namespace Live_Music
         /// 声音图标状态的实例
         /// </summary>
         private VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
+        /// <summary>
+        /// 任务取消标志
+        /// </summary>
+        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -412,6 +417,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void StopMusic(object sender, RoutedEventArgs e)
         {
+            CancellationTokenSource.Cancel();
             musicProcessGrid.Visibility = Visibility.Collapsed;
             ChangeMusicControlButtonsUsableState();
             ResetMusicPropertiesList();
@@ -541,7 +547,7 @@ namespace Live_Music
         /// 播放音乐,以及获取音乐的属性
         /// </summary>
         /// <param name="file">传入的音乐文件</param>
-        private void PlayAndGetMusicProperites(IReadOnlyList<StorageFile> fileList)
+        private async void PlayAndGetMusicProperites(IReadOnlyList<StorageFile> fileList)
         {
             if (IsFirstTimeAddMusic == true)
             {
@@ -555,65 +561,75 @@ namespace Live_Music
                 musicService.mediaPlayer.Play();
             }
 
-            for (int i = 0; i < fileList.Count; i++)
+            await Task.Run(async () =>
             {
-                StorageFile file = fileList[i];
-
-                Task<MusicProperties> musicPropertiesTask = file.Properties.GetMusicPropertiesAsync().AsTask();
-                musicPropertiesTask.Wait();
-                MusicProperties musicProperties = musicPropertiesTask.Result;
-
-                if (string.IsNullOrWhiteSpace(musicProperties.Artist) == true)
+                for (int i = 0; i < fileList.Count; i++)
                 {
-                    musicProperties.AlbumArtist = "未知艺术家";
+                    if (CancellationTokenSource.IsCancellationRequested == true)
+                    {
+                        ResetMusicPropertiesList();
+                        musicService.StopMusic();
+                        break;
+                    }
+                    StorageFile file = fileList[i];
+
+                    Task<MusicProperties> musicPropertiesTask = file.Properties.GetMusicPropertiesAsync().AsTask();
+                    musicPropertiesTask.Wait();
+                    MusicProperties musicProperties = musicPropertiesTask.Result;
+
+                    if (string.IsNullOrWhiteSpace(musicProperties.Artist) == true)
+                    {
+                        musicProperties.AlbumArtist = "未知艺术家";
+                    }
+
+                    if (string.IsNullOrWhiteSpace(musicProperties.Title) == true)
+                    {
+                        musicProperties.Title = file.Name;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(musicProperties.Album) == true)
+                    {
+                        musicProperties.Album = "未知专辑";
+                    }
+
+                    MusicPropertiesList.Add(musicProperties);
+
+                    Task<StorageItemThumbnail> musicThumbnailTask = file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem).AsTask();
+                    musicThumbnailTask.Wait();
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        BitmapImage bitmapImage = new BitmapImage();
+                        bitmapImage.SetSource(musicThumbnailTask.Result);
+                        MusicImageList.Add(bitmapImage);
+                    });
+
+                    ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
+                    Task<Color> imageColorsTask = Task.Run(() => imageThemeBrush.GetPaletteImage(musicThumbnailTask.Result));
+                    imageColorsTask.Wait();
+                    MusicGirdColorsList.Add(imageColorsTask.Result);
+
+                    string AlbumSaveName = musicProperties.Album;
+                    AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
+
+                    Task task = new Task(async () =>
+                    {
+                        var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg");
+                        await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
+                        fileStream.Dispose();
+                    });
+                    task.Start();
+                    task.Wait();
+                    MediaPlaybackItem mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList[i]));
+                    MediaItemDisplayProperties props = mediaPlaybackItem.GetDisplayProperties();
+                    props.Type = Windows.Media.MediaPlaybackType.Music;
+                    props.MusicProperties.Title = musicProperties.Title;
+                    props.MusicProperties.Artist = musicProperties.Artist;
+                    props.MusicProperties.AlbumTitle = musicProperties.AlbumArtist;
+                    props.Thumbnail = RandomAccessStreamReference.CreateFromStream(musicThumbnailTask.Result);
+                    mediaPlaybackItem.ApplyDisplayProperties(props);
+                    musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
                 }
-
-                if (string.IsNullOrWhiteSpace(musicProperties.Title) == true)
-                {
-                    musicProperties.Title = file.Name;
-                }
-
-                if (string.IsNullOrWhiteSpace(musicProperties.Album) == true)
-                {
-                    musicProperties.Album = "未知专辑";
-                }
-
-                MusicPropertiesList.Add(musicProperties);
-
-                Task<StorageItemThumbnail> musicThumbnailTask = file.GetScaledImageAsThumbnailAsync(ThumbnailMode.SingleItem).AsTask();
-                musicThumbnailTask.Wait();
-
-                BitmapImage bitmapImage = new BitmapImage();
-                bitmapImage.SetSource(musicThumbnailTask.Result);
-
-                MusicImageList.Add(bitmapImage);
-
-                ImageColors.ImageThemeBrush imageThemeBrush = new ImageColors.ImageThemeBrush();
-                Task<Color> imageColorsTask = Task.Run(() => imageThemeBrush.GetPaletteImage(musicThumbnailTask.Result));
-                imageColorsTask.Wait();
-                MusicGirdColorsList.Add(imageColorsTask.Result);
-
-                string AlbumSaveName = musicProperties.Album;
-                AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
-
-                Task task = new Task(async () => 
-                {
-                    var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg");
-                    await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
-                    fileStream.Dispose();
-                });
-                task.Start();
-                task.Wait();
-                MediaPlaybackItem mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList[i]));
-                MediaItemDisplayProperties props = mediaPlaybackItem.GetDisplayProperties();
-                props.Type = Windows.Media.MediaPlaybackType.Music;
-                props.MusicProperties.Title = musicProperties.Title;
-                props.MusicProperties.Artist = musicProperties.Artist;
-                props.MusicProperties.AlbumTitle = musicProperties.AlbumArtist;
-                props.Thumbnail = RandomAccessStreamReference.CreateFromStream(musicThumbnailTask.Result);
-                mediaPlaybackItem.ApplyDisplayProperties(props);
-                musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
-            }
+            });
             SetTileSource();
         }
 
@@ -811,7 +827,7 @@ namespace Live_Music
         private void EnterNowPlaying(object sender = null, RoutedEventArgs e = null)
         {
             IsEnteringNowPlaying = true;
-            Frame.Navigate(typeof(NowPlaying), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
+            Frame.Navigate(typeof(NowPlaying), null);
         }
 
         /// <summary>
@@ -1100,32 +1116,14 @@ namespace Live_Music
             base.OnNavigatedTo(e);
         }
 
-        private async void MusicDragOver(object sender, DragEventArgs e)
+        private void MusicDragOver(object sender, DragEventArgs e)
         {
             var deferral = e.GetDeferral();
             e.DragUIOverride.Caption = "播放";
             DataPackageView dataview = e.DataView;
             if (dataview.Contains(StandardDataFormats.StorageItems))
             {
-                var items = await dataview.GetStorageItemsAsync();
-                if (items.Count > 0)
-                {
-                    await Task.Run(async () =>
-                    {
-                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                         {
-                             List<StorageFile> files = (from IStorageItem file in items.AsParallel() where file.IsOfType(StorageItemTypes.File) select file as StorageFile).ToList();
-                             if (files.Count > 0)
-                             {
-                                 e.AcceptedOperation = DataPackageOperation.Copy;
-                             }
-                             else
-                             {
-                                 e.AcceptedOperation = DataPackageOperation.None;
-                             }
-                         });
-                    });
-                }
+                e.AcceptedOperation = DataPackageOperation.Copy;
             }
             else
             {
@@ -1139,17 +1137,70 @@ namespace Live_Music
             var defer = e.GetDeferral();
             try
             {
+                appInfomation.IsMediaControlVisible = Visibility.Visible;
+                appInfomation.InfoBarTitle = "正在添加文件...";
+                appInfomation.IsInfoBarButtonShow = Visibility.Collapsed;
+                appInfomation.InfoBarSeverity = muxc.InfoBarSeverity.Informational;
+                appInfomation.InfoBarMessage = "";
+                appInfomation.IsInfoBarOpen = true;
                 DataPackageView dpv = e.DataView;
-                if (dpv.Contains(StandardDataFormats.StorageItems))
+                await Task.Run(() =>
                 {
-                    var files = await dpv.GetStorageItemsAsync();
-                    appInfomation.IsMediaControlVisible = Visibility.Visible;
-                    PlayAndGetMusicProperites((from StorageFile file in files where file.ContentType == "audio/mpeg" && file.IsOfType(StorageItemTypes.File) select file).ToList());
-                }
+                    GetFiles(dpv);
+                });
             }
             finally
             {
                 defer.Complete();
+            }
+
+            async void GetFiles(DataPackageView dpv)
+            {
+                if (dpv.Contains(StandardDataFormats.StorageItems))
+                {
+                    IReadOnlyList<IStorageItem> files = await dpv.GetStorageItemsAsync();
+                    List<StorageFile> musicList = new List<StorageFile>();
+                    if (files.Count > 10)
+                    {
+                        foreach (IStorageItem file in files.AsParallel())
+                        {
+                            if (file.IsOfType(StorageItemTypes.File) && (file as StorageFile).ContentType == "audio/mpeg")
+                            {
+                                musicList.Add(file as StorageFile);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        musicList = (from IStorageItem file in files.AsParallel() where file.IsOfType(StorageItemTypes.File) && (file as StorageFile).ContentType == "audio/mpeg" select file as StorageFile).ToList();
+                    }
+
+                    if (musicList.Count > 0)
+                    {
+                        PlayAndGetMusicProperites(musicList);
+                        appInfomation.IsInfoBarOpen = false;
+                    }
+                    else
+                    {
+                        List<StorageFolder> musicFolderList = (from IStorageItem file in files where file.IsOfType(StorageItemTypes.Folder) select file as StorageFolder).ToList();
+                        if (musicFolderList.Count > 0)
+                        {
+                            appInfomation.InfoBarTitle = "无法播放拖入的文件夹";
+                            appInfomation.IsInfoBarButtonShow = Visibility.Collapsed;
+                            appInfomation.InfoBarSeverity = muxc.InfoBarSeverity.Warning;
+                            appInfomation.InfoBarMessage = "目前不支持文件夹拖入";
+                            appInfomation.IsInfoBarOpen = true;
+                        }
+                        else
+                        {
+                            appInfomation.InfoBarTitle = "无法播放拖入的文件";
+                            appInfomation.IsInfoBarButtonShow = Visibility.Collapsed;
+                            appInfomation.InfoBarSeverity = muxc.InfoBarSeverity.Warning;
+                            appInfomation.InfoBarMessage = "请检查你拖入的文件";
+                            appInfomation.IsInfoBarOpen = true;
+                        }
+                    }
+                }
             }
         }
 

@@ -173,7 +173,13 @@
             <Setter Property="CornerRadius" Value="25"/>
         </Style>
     </Page.Resources>
-
+    
+    <Page.Transitions>
+        <TransitionCollection>
+            <EntranceThemeTransition x:Name="entranceTransition" FromHorizontalOffset="0" FromVerticalOffset="-1000" />
+        </TransitionCollection>
+    </Page.Transitions>
+    
     <Grid>
         <StackPanel x:Name="noneMusicStackPanel" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="请播放一些音乐,这里什么都没有。" FontSize="16" FontWeight="SemiBold"/>

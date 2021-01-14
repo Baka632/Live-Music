@@ -11,6 +11,7 @@
     >
     <Page.Resources>
         <ResourceDictionary>
+            <!--#region Styles -->
             <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">
                 <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -170,8 +171,15 @@
                 <Setter Property="Margin" Value="5,0,5,0"/>
                 <Setter Property="CornerRadius" Value="25"/>
             </Style>
+            <!--#endregion-->
         </ResourceDictionary>
     </Page.Resources>
+
+    <Page.Transitions>
+        <TransitionCollection>
+            <EntranceThemeTransition FromHorizontalOffset="0" FromVerticalOffset="10"  />
+        </TransitionCollection>
+    </Page.Transitions>
     
     <Grid x:Name="mainPageGrid">
         <Grid.RowDefinitions>
@@ -543,6 +551,13 @@
                 <Button Visibility="{x:Bind appInfomation.IsInfoBarButtonShow,Mode=OneWay}" Content="显示详细信息" Click="{x:Bind appInfomation.InfoBarButtonClick,Mode=OneWay}" />
             </muxc:InfoBar.ActionButton>
         </muxc:InfoBar>
+
+        <muxc:TeachingTip x:Name="MusicAdding"
+	        Title="正在添加文件..." IsOpen="False">
+            <muxc:TeachingTip.IconSource>
+                <muxc:SymbolIconSource Symbol="Copy" />
+            </muxc:TeachingTip.IconSource>
+        </muxc:TeachingTip>
 
         <TextBlock x:Name="titleTextBlock" Text="Live Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
 

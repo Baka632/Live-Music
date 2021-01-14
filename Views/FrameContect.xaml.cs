@@ -81,25 +81,20 @@ namespace Live_Music.Views
 
         private async void GetMusic()
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            StorageFolder musicFolder = KnownFolders.MusicLibrary;
+            fileList = (from file in await musicFolder.GetFilesAsync(CommonFileQuery.OrderByMusicProperties) where file.ContentType == "audio/mpeg" select file).ToList();
+            foreach (StorageFile file in fileList)
             {
-                StorageFolder musicFolder = KnownFolders.MusicLibrary;
-                fileList = await musicFolder.GetFilesAsync(CommonFileQuery.OrderByMusicProperties);
-                BitmapImage bitmapImage = new BitmapImage();
-                InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
-                foreach (StorageFile file in fileList)
+                MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
+                if (!musicTitleList.Contains(musicProperties.Album) && string.IsNullOrWhiteSpace(musicProperties.Title) != true)
                 {
-                    MusicProperties musicProperties = await file.Properties.GetMusicPropertiesAsync();
-                    if (!musicTitleList.Contains(musicProperties.Album)&& string.IsNullOrWhiteSpace(musicProperties.Title) != true)
-                    {
-                        musicTitleList.Add(musicProperties.Album);
-                    }
-                    else if (!musicTitleList.Contains("未知专辑"))
-                    {
-                        musicTitleList.Add("未知专辑");
-                    }
+                    musicTitleList.Add(musicProperties.Album);
                 }
-            });
+                else if (!musicTitleList.Contains("未知专辑"))
+                {
+                    musicTitleList.Add("未知专辑");
+                }
+            }
         }
 
         private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
