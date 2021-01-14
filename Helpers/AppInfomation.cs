@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Windows.ApplicationModel;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 
@@ -267,5 +268,13 @@ namespace Live_Music
                 OnPropertiesChanged();
             }
         }
+
+        public string ApplicationVersion { get; } = string.Format("{0} {1}.{2}.{3}.{4}",
+                    "版本",
+                    Package.Current.Id.Version.Major,
+                    Package.Current.Id.Version.Minor,
+                    Package.Current.Id.Version.Build,
+                    Package.Current.Id.Version.Revision
+        );
     }
 }

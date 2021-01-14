@@ -623,9 +623,13 @@ namespace Live_Music
 
                     Task ImageCreateTask = new Task(async () =>
                     {
-                        var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg");
-                        await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
-                        fileStream.Dispose();
+                        if (!File.Exists($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
+                        {
+                            StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync($"{AlbumSaveName}.jpg", CreationCollisionOption.OpenIfExists);
+                            var fileStream = await storageFile.OpenStreamForWriteAsync();
+                            await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
+                            fileStream.Dispose();
+                        }
                     });
                     ImageCreateTask.Start();
                     ImageCreateTask.Wait();

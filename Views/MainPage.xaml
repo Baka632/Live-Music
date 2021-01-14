@@ -267,7 +267,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image Grid.Column="0" Margin="0,0,10,0" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
+                    <Image x:Name="musicImage" Grid.Column="0" Margin="0,0,10,0" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
                     <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>

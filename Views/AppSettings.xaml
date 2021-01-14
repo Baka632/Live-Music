@@ -6,9 +6,65 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Page_Loaded">
 
     <Grid>
-        <TextBlock Text="这是一个设置页面" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Pivot>
+            <PivotItem Header="设置">
+                <ScrollViewer>
+                    <StackPanel>
+                        <ComboBox x:Name="themeComboBox" SelectionChanged="ThemeChanged" Margin="0,5,0,5" SelectedItem="{x:Bind ThemeSettingProperty,Mode=OneWay}" Header="主题设置">
+                            <x:String>浅色</x:String>
+                            <x:String>深色</x:String>
+                            <x:String>使用系统设置</x:String>
+                        </ComboBox>
+                        <StackPanel Margin="0,10,0,0">
+                            <TextBlock Margin="0,0,0,5" Text="{x:Bind TempFolderSize,Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Click="ClearTempFolder" Content="清空缓存"/>
+                                <ProgressRing x:Name="clearProgreeRing" IsActive="False" Margin="5,0,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+            <PivotItem Header="关于">
+                <ScrollViewer>
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <ResourceDictionary>
+                                <ResourceDictionary.ThemeDictionaries>
+                                    <ResourceDictionary x:Key="Light">
+                                        <Style TargetType="Image" x:Key="GithubImage">
+                                            <Setter Property="Source" Value="/Assets/GitHub-Mark-32px.png"/>
+                                        </Style>
+                                    </ResourceDictionary>
+                                    <ResourceDictionary x:Key="Dark">
+                                        <Style TargetType="Image" x:Key="GithubImage">
+                                            <Setter Property="Source" Value="/Assets/Github-Mark-Light-32px.png"/>
+                                        </Style>
+                                    </ResourceDictionary>
+                                </ResourceDictionary.ThemeDictionaries>
+                            </ResourceDictionary>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="110" Width="110" Source="/Assets/Live Music Light.png" Stretch="UniformToFill"/>
+                            <StackPanel Margin="10,0,0,0">
+                                <TextBlock Text="Live Music" Style="{StaticResource BaseTextBlockStyle}"/>
+                                <TextBlock Text="{x:Bind appInfomation.ApplicationVersion}"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                    <Button Click="MailTo" ToolTipService.ToolTip="邮箱" Margin="0,0,5,0" Content="&#xE119;" FontSize="20" FontFamily="Segoe MDL2 Assets" Background="Transparent" Height="40" Width="40"/>
+                                    <Button Click="GoToGithub" ToolTipService.ToolTip="Github" Background="Transparent" Height="40" Width="40">
+                                        <Image Style="{ThemeResource GithubImage}" Stretch="UniformToFill" Width="19" Height="19"/>
+                                    </Button>
+                                </StackPanel>
+                                <HyperlinkButton Content="隐私声明" NavigateUri="https://github.com/Baka632/LiveStudioPrivacyStatement/blob/main/PrivacyStatement.md"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>
