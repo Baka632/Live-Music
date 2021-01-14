@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
@@ -16,6 +18,7 @@ namespace Live_Music.Services
     /// </summary>
     public class MusicService : IDisposable
     {
+        public event Action<RepeatingMusicValueChangedEventArgs> RepeatingMusicValueChanged;
         /// <summary>
         /// 音乐播放器的实例
         /// </summary>
@@ -79,6 +82,7 @@ namespace Live_Music.Services
             GC.SuppressFinalize(this);
         }
         #endregion
+
 
         /// <summary>
         /// 终止音乐播放
@@ -173,5 +177,32 @@ namespace Live_Music.Services
                     break;
             }
         }
+
+        public bool? IsRepeatingMusic
+        {
+            get 
+            {
+                if (mediaPlaybackList.AutoRepeatEnabled == true && mediaPlayer.IsLoopingEnabled == false)
+                {
+                    RepeatingMusicValueChanged?.Invoke(new RepeatingMusicValueChangedEventArgs() { NewValue = true });
+                    return true;
+                }
+                else if (mediaPlaybackList.AutoRepeatEnabled == false && mediaPlayer.IsLoopingEnabled == false)
+                {
+                    RepeatingMusicValueChanged?.Invoke(new RepeatingMusicValueChangedEventArgs() { NewValue = false });
+                    return false;
+                }
+                else
+                {
+                    RepeatingMusicValueChanged?.Invoke(new RepeatingMusicValueChangedEventArgs() { NewValue = null });
+                    return null;
+                }
+            }
+        }
+    }
+
+    public class RepeatingMusicValueChangedEventArgs : EventArgs
+    {
+        public bool? NewValue { get; set; }
     }
 }

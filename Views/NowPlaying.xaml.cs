@@ -56,6 +56,7 @@ namespace Live_Music.Views
         {
             this.InitializeComponent();
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+            musicService.RepeatingMusicValueChanged += MusicService_RepeatingMusicValueChanged;
             NavigationCacheMode = NavigationCacheMode.Required;
             switch (musicService.mediaPlayer.PlaybackSession.PlaybackState)
             {
@@ -74,6 +75,11 @@ namespace Live_Music.Views
             MainPage.dispatcherTimer.Tick += DispatcherTimer_Tick;
             processSlider.AddHandler(UIElement.PointerReleasedEvent /*哪个事件*/, new PointerEventHandler(UIElement_OnPointerReleased) /*使用哪个方法处理*/, true /*如果在之前处理，是否还使用函数*/);
             processSlider.AddHandler(UIElement.PointerPressedEvent /*哪个事件*/, new PointerEventHandler(UIElement_EnterPressedReleased) /*使用哪个方法处理*/, true /*如果在之前处理，是否还使用函数*/);
+        }
+
+        private void MusicService_RepeatingMusicValueChanged(RepeatingMusicValueChangedEventArgs e)
+        {
+            appInfomation.RepeatMusicButtonState = e.NewValue;
         }
 
         /// <summary>
@@ -241,7 +247,10 @@ namespace Live_Music.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ShuffleMusic(object sender, RoutedEventArgs e) => musicService.ShuffleMusic();
+        private void ShuffleMusic(object sender, RoutedEventArgs e)
+        {
+            musicService.ShuffleMusic();
+        }
 
         /// <summary>
         /// 改变播放器"重复播放"的属性
@@ -250,20 +259,23 @@ namespace Live_Music.Views
         /// <param name="e"></param>
         private void RepeatMusic(object sender, RoutedEventArgs e)
         {
-            switch (repeatMusicButton.IsChecked)
+            // ButtonOrder: true -> null -> false!!!
+            switch (musicService.IsRepeatingMusic)
             {
-                case true:
-                    musicService.RepeatMusic(true);
-                    break;
                 case false:
-                    musicService.RepeatMusic(false);
+                    musicService.RepeatMusic(true);
+                    appInfomation.RepeatMusicButtonState = true;
                     appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
                     break;
-                case null:
+                case true:
                     musicService.RepeatMusic(null);
+                    appInfomation.RepeatMusicButtonState = null;
                     appInfomation.RepeatMusicButtonIconGlyph = "\uE1CC";
                     break;
-                default:
+                case null:
+                    musicService.RepeatMusic(false);
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                    appInfomation.RepeatMusicButtonState = false;
                     break;
             }
         }
@@ -302,6 +314,20 @@ namespace Live_Music.Views
                     processSlider.Maximum = musicInfomation.MusicDurationProperties;
                 });
                 IsFirstTimeEnterPage = false;
+            }
+            appInfomation.RepeatMusicButtonState = musicService.IsRepeatingMusic;
+            appInfomation.ShuffleMusicButtonState = musicService.mediaPlaybackList.ShuffleEnabled;
+            switch (musicService.IsRepeatingMusic)
+            {
+                case true:
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                    break;
+                case false:
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                    break;
+                case null:
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CC";
+                    break;
             }
         }
 

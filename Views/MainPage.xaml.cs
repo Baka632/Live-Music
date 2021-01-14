@@ -84,13 +84,13 @@ namespace Live_Music
         /// </summary>
         public static bool IsPointerEntered = false;
         /// <summary>
+        /// 指示现在是否在添加音乐的值
+        /// </summary>
+        private bool IsAddingMusic = false;
+        /// <summary>
         /// 声音图标状态的实例
         /// </summary>
         private VolumeGlyphState volumeGlyphState = App.volumeGlyphState;
-        /// <summary>
-        /// 任务取消标志
-        /// </summary>
-        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// 指示是否从启动以来第一次添加音乐
@@ -144,7 +144,7 @@ namespace Live_Music
         {
             this.InitializeComponent();
             appInfomation.IsPlayerButtonEnabled = false;
-
+            musicService.RepeatingMusicValueChanged += MusicService_RepeatingMusicValueChanged;
             Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             musicService.mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
             musicService.mediaPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
@@ -167,6 +167,11 @@ namespace Live_Music
                 appInfomation.IsMusicPlayingControlVisible = Visibility.Collapsed;
             }
             ChangeNavgationViewSelectItem();
+        }
+
+        private void MusicService_RepeatingMusicValueChanged(RepeatingMusicValueChangedEventArgs e)
+        {
+            appInfomation.RepeatMusicButtonState = e.NewValue;
         }
 
         private void NowPlaying_NowPlayingDargOverEvent(NowPlayingDragOverEventArgs args)
@@ -285,11 +290,14 @@ namespace Live_Music
             if (musicService.mediaPlaybackList.ShuffleEnabled == true)
             {
                 ShufflingMusicProperties = "随机播放:开";
+                appInfomation.ShuffleMusicButtonState = true;
             }
             else
             {
                 ShufflingMusicProperties = "随机播放:关";
+                appInfomation.ShuffleMusicButtonState = false;
             }
+            SetTileSource();
         }
 
         /// <summary>
@@ -299,23 +307,26 @@ namespace Live_Music
         /// <param name="e"></param>
         private void RepeatMusic(object sender, RoutedEventArgs e)
         {
-            switch ((sender as ToggleButton)?.IsChecked)
+            // ButtonOrder: true -> null -> false
+            switch (musicService.IsRepeatingMusic)
             {
-                case true:
+                case false:
                     musicService.RepeatMusic(true);
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                    appInfomation.RepeatMusicButtonState = true;
                     RepeatingMusicProperties = "循环播放:全部循环";
                     break;
-                case false:
-                    musicService.RepeatMusic(false);
-                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
-                    RepeatingMusicProperties = "循环播放:关闭循环";
-                    break;
-                case null:
+                case true:
                     musicService.RepeatMusic(null);
+                    appInfomation.RepeatMusicButtonState = null;
                     appInfomation.RepeatMusicButtonIconGlyph = "\uE1CC";
                     RepeatingMusicProperties = "循环播放:单曲循环";
                     break;
-                default:
+                case null:
+                    musicService.RepeatMusic(false);
+                    appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                    appInfomation.RepeatMusicButtonState = false;
+                    RepeatingMusicProperties = "循环播放:关闭循环";
                     break;
             }
         }
@@ -417,7 +428,7 @@ namespace Live_Music
         /// <param name="e"></param>
         private void StopMusic(object sender, RoutedEventArgs e)
         {
-            CancellationTokenSource.Cancel();
+            IsAddingMusic = false;
             musicProcessGrid.Visibility = Visibility.Collapsed;
             ChangeMusicControlButtonsUsableState();
             ResetMusicPropertiesList();
@@ -549,6 +560,7 @@ namespace Live_Music
         /// <param name="file">传入的音乐文件</param>
         private async void PlayAndGetMusicProperites(IReadOnlyList<StorageFile> fileList)
         {
+            await Task.Run(() => GetProps(fileList));
             if (IsFirstTimeAddMusic == true)
             {
                 musicService.mediaPlayer.Source = musicService.mediaPlaybackList;
@@ -556,22 +568,20 @@ namespace Live_Music
                 ChangeMusicControlButtonsUsableState();
                 IsFirstTimeAddMusic = false;
             }
-            if (musicService.mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.None || musicService.mediaPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
-            {
-                musicService.mediaPlayer.Play();
-            }
+            SetTileSource();
 
-            await Task.Run(async () =>
+            async void GetProps(IReadOnlyList<StorageFile> fileList1)
             {
-                for (int i = 0; i < fileList.Count; i++)
+                IsAddingMusic = true;
+                for (int i = 0; i < fileList1.Count; i++)
                 {
-                    if (CancellationTokenSource.IsCancellationRequested == true)
+                    if (IsAddingMusic == false)
                     {
                         ResetMusicPropertiesList();
                         musicService.StopMusic();
                         break;
                     }
-                    StorageFile file = fileList[i];
+                    StorageFile file = fileList1[i];
 
                     Task<MusicProperties> musicPropertiesTask = file.Properties.GetMusicPropertiesAsync().AsTask();
                     musicPropertiesTask.Wait();
@@ -611,15 +621,15 @@ namespace Live_Music
                     string AlbumSaveName = musicProperties.Album;
                     AlbumSaveName = AlbumSaveName.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
 
-                    Task task = new Task(async () =>
+                    Task ImageCreateTask = new Task(async () =>
                     {
                         var fileStream = File.Create($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg");
                         await WindowsRuntimeStreamExtensions.AsStreamForRead(musicThumbnailTask.Result.GetInputStreamAt(0)).CopyToAsync(fileStream);
                         fileStream.Dispose();
                     });
-                    task.Start();
-                    task.Wait();
-                    MediaPlaybackItem mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList[i]));
+                    ImageCreateTask.Start();
+                    ImageCreateTask.Wait();
+                    MediaPlaybackItem mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromStorageFile(fileList1[i]));
                     MediaItemDisplayProperties props = mediaPlaybackItem.GetDisplayProperties();
                     props.Type = Windows.Media.MediaPlaybackType.Music;
                     props.MusicProperties.Title = musicProperties.Title;
@@ -629,8 +639,8 @@ namespace Live_Music
                     mediaPlaybackItem.ApplyDisplayProperties(props);
                     musicService.mediaPlaybackList.Items.Add(mediaPlaybackItem);
                 }
-            });
-            SetTileSource();
+                IsAddingMusic = false;
+            }
         }
 
         /// <summary>
@@ -1094,12 +1104,30 @@ namespace Live_Music
         }
 
 
+
         /// <summary>
         /// 重写的OnNavigatedTo方法
         /// </summary>
         /// <param name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (e.NavigationMode == NavigationMode.Back)
+            {
+                appInfomation.ShuffleMusicButtonState = musicService.mediaPlaybackList.ShuffleEnabled;
+                appInfomation.RepeatMusicButtonState = musicService.IsRepeatingMusic;
+                switch (musicService.IsRepeatingMusic)
+                {
+                    case true:
+                        appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                        break;
+                    case false:
+                        appInfomation.RepeatMusicButtonIconGlyph = "\uE1CD";
+                        break;
+                    case null:
+                        appInfomation.RepeatMusicButtonIconGlyph = "\uE1CC";
+                        break;
+                }
+            }
             if (e.Parameter is IReadOnlyList<StorageFile> file && e.Parameter != null && IsEnteringNowPlaying == false)
             {
                 OpenMusicFile(file);
@@ -1208,7 +1236,7 @@ namespace Live_Music
         {
             if (sender.Text == "Debug")
             {
-                System.Diagnostics.Debug.WriteLine(this.Width);
+
             }
         }
     }

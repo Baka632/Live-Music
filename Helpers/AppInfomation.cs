@@ -12,18 +12,6 @@ namespace Live_Music
     public class AppInfomation : DependencyObject , INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// 通知系统属性已经发生更改
-        /// </summary>
-        /// <param name="propertyName">发生更改的属性名称,其填充是自动完成的</param>
-        public async void OnPropertiesChanged([CallerMemberName] string propertyName = "")
-        {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            });
-        }
         /// <summary>
         /// 指示InfoBar是否打开的值
         /// </summary>
@@ -72,6 +60,31 @@ namespace Live_Music
         /// "循环播放"按钮的图标的值
         /// </summary>
         private string _RepeatMusicButtonIconGlyph = "\uE1CD";
+        /// <summary>
+        /// "循环播放"按钮的状态
+        /// </summary>
+        private bool? _RepeatMusicButtonState;
+        /// <summary>
+        /// "随机播放"按钮的状态
+        /// </summary>
+        private bool _ShuffleMusicButtonState;
+
+        public AppInfomation()
+        {
+            RepeatMusicButtonState = App.musicService.IsRepeatingMusic;
+        }
+
+        /// <summary>
+        /// 通知系统属性已经发生更改
+        /// </summary>
+        /// <param name="propertyName">发生更改的属性名称,其填充是自动完成的</param>
+        public async void OnPropertiesChanged([CallerMemberName] string propertyName = "")
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            });
+        }
 
         /// <summary>
         /// 指示InfoBar是否打开的属性
@@ -229,5 +242,30 @@ namespace Live_Music
             }
         }
 
+        /// <summary>
+        /// "循环播放"按钮的状态的属性
+        /// </summary>
+        public bool? RepeatMusicButtonState
+        {
+            get => _RepeatMusicButtonState;
+            set 
+            { 
+                _RepeatMusicButtonState = value;
+                OnPropertiesChanged();
+            }
+        }
+
+        /// <summary>
+        /// "随机播放"按钮的状态的属性
+        /// </summary>
+        public bool ShuffleMusicButtonState
+        {
+            get => _ShuffleMusicButtonState;
+            set 
+            { 
+                _ShuffleMusicButtonState = value;
+                OnPropertiesChanged();
+            }
+        }
     }
 }

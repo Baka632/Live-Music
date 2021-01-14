@@ -242,9 +242,9 @@
 
                         <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE101;" Click="NextMusic"/>
 
-                        <ToggleButton x:Name="shuffleMusicToggleButton" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource musicControlToggleButtonStyle}"/>
+                        <ToggleButton IsChecked="{x:Bind appInfomation.ShuffleMusicButtonState,Mode=OneWay}" x:Name="shuffleMusicToggleButton" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource musicControlToggleButtonStyle}"/>
 
-                        <ToggleButton x:Name="repeatMusicButton" IsThreeState="True" Click="RepeatMusic" Margin="0,0,6,0" Style="{StaticResource musicControlToggleButtonStyle}">
+                        <ToggleButton x:Name="repeatMusicButton" IsChecked="{x:Bind appInfomation.RepeatMusicButtonState,Mode=OneWay}" IsThreeState="True" Click="RepeatMusic" Margin="0,0,6,0" Style="{StaticResource musicControlToggleButtonStyle}">
                             <FontIcon FontSize="20" Glyph="{x:Bind appInfomation.RepeatMusicButtonIconGlyph,Mode=OneWay}"/>
                         </ToggleButton>
 

@@ -287,7 +287,7 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Orientation="Horizontal">
-                    <ToggleButton ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
+                    <ToggleButton IsChecked="{x:Bind appInfomation.ShuffleMusicButtonState,Mode=OneWay}"  ToolTipService.ToolTip="{x:Bind ShufflingMusicProperties,Mode=OneWay}" Click="ShuffleMusic" Content="&#xE14B;" Style="{StaticResource mediaControlToggleButtonStyle}"/>
 
                     <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="PreviousMusic" Content="&#xE100;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
 
@@ -301,7 +301,7 @@
 
                     <Button IsEnabled="{x:Bind appInfomation.IsPlayerButtonEnabled,Mode=OneWay}" Click="NextMusic" Content="&#xE101;" Style="{StaticResource musicControlButtonStyle}" FontSize="20" Width="35" Height="35"/>
 
-                    <ToggleButton ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Style="{StaticResource musicControlToggleButtonStyle}">
+                    <ToggleButton IsChecked="{x:Bind appInfomation.RepeatMusicButtonState,Mode=OneWay}" ToolTipService.ToolTip="{x:Bind RepeatingMusicProperties,Mode=OneWay}"  IsThreeState="True" Click="RepeatMusic" Style="{StaticResource musicControlToggleButtonStyle}">
                         <FontIcon FontSize="16" Glyph="{x:Bind appInfomation.RepeatMusicButtonIconGlyph,Mode=OneWay}"/>
                     </ToggleButton>
                 </StackPanel>
@@ -551,13 +551,6 @@
                 <Button Visibility="{x:Bind appInfomation.IsInfoBarButtonShow,Mode=OneWay}" Content="显示详细信息" Click="{x:Bind appInfomation.InfoBarButtonClick,Mode=OneWay}" />
             </muxc:InfoBar.ActionButton>
         </muxc:InfoBar>
-
-        <muxc:TeachingTip x:Name="MusicAdding"
-	        Title="正在添加文件..." IsOpen="False">
-            <muxc:TeachingTip.IconSource>
-                <muxc:SymbolIconSource Symbol="Copy" />
-            </muxc:TeachingTip.IconSource>
-        </muxc:TeachingTip>
 
         <TextBlock x:Name="titleTextBlock" Text="Live Music" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Margin="11,11,0,0"/>
 
