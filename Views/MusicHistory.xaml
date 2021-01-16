@@ -2,27 +2,38 @@
     x:Class="Live_Music.Views.MusicHistory"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
     xmlns:local="using:Live_Music.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:data="using:Live_Music.Helpers"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Page.Resources>
-        <CollectionViewSource x:Name="ContactsCVS"  IsSourceGrouped="True" />
-        <DataTemplate x:DataType="data:MusicInfomation" x:Key="musicHistroyDataTemplate">
-            <StackPanel>
-                <Image Source="{x:Bind MusicImageProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="90" Height="90"/>
-                <TextBlock Text="{x:Bind MusicAlbumProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Text="{x:Bind MusicAlbumArtistProperties,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </StackPanel>
-        </DataTemplate>
-    </Page.Resources>
 
     <Grid>
-        <TextBlock Text="播放历史"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-        <GridView ItemTemplate="{StaticResource musicHistroyDataTemplate}"/>
-
+        <TextBlock Margin="11,0,0,5" Text="播放历史" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="ExtraLight" FontSize="35"/>
+        <GridView animations:ReorderGridAnimation.Duration="500" Loading="GridView_Loading" Margin="11,10,0,0" ItemsSource="{x:Bind musicHistoryTemplates,Mode=OneWay}" Grid.Row="1">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="data:MusicHistoryTemplate">
+                    <StackPanel>
+                        <Image Source="{x:Bind ContentImage}" Width="140" Height="140"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock FontWeight="Bold" Text="{x:Bind MusicAlbum}" Grid.Row="0"/>
+                            <TextBlock Foreground="Gray" Text="{x:Bind MusicAlbumArtist}" Grid.Row="1"/>
+                        </Grid>
+                    </StackPanel>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
     </Grid>
 </Page>

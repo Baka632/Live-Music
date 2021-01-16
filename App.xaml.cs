@@ -34,6 +34,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Windows.Devices.Portable;
+using System.Text.Json;
 
 namespace Live_Music
 {
@@ -106,6 +107,10 @@ namespace Live_Music
         /// 应用程序运行过程中的信息的实例
         /// </summary>
         public static AppInfomation appInfomation = new AppInfomation();
+        /// <summary>
+        /// 音乐历史记录的实例
+        /// </summary>
+        public static MusicHistoryHelper musicHistoryHelper = new MusicHistoryHelper();
         /// <summary>
         /// 在用户代码中未处理的异常的出现数量
         /// </summary>
@@ -364,7 +369,7 @@ namespace Live_Music
         /// 将在启动应用程序以打开特定文件等情况下使用。
         /// </summary>
         /// <param name="e">有关启动请求和过程的详细信息。</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
             Window.Current.Content = rootFrame;
@@ -378,7 +383,12 @@ namespace Live_Music
             //标题栏按钮颜色
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Windows.UI.Colors.Transparent;
-
+            //if (File.Exists($"{ApplicationData.Current.LocalFolder.Path}\\MusicHistory.json"))
+            //{
+            //    StorageFile jsonFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MusicHistory.json");
+            //    StreamReader streamReader = new StreamReader(await jsonFile.OpenStreamForReadAsync());
+            //    musicHistoryHelper.MusicHistoryItemsProperty = JsonSerializer.Deserialize<Dictionary<string, MusicHistoryTemplate>>(streamReader.ReadToEnd());
+            //}
             #region 暂时不用的代码
             //var WhiteBlack = (Color)Application.Current.Resources["WhiteBlack"];
             //titleBar.ButtonForegroundColor = WhiteBlack;
@@ -441,7 +451,7 @@ namespace Live_Music
         /// </summary>
         /// <param name="sender">挂起的请求的源。</param>
         /// <param name="e">有关挂起请求的详细信息。</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
@@ -449,6 +459,13 @@ namespace Live_Music
 
             settings.MusicVolume = musicService.mediaPlayer.Volume; //保存现在的音量
             Debug.WriteLine("[Suspending]已保存现在的音量");
+            //Debug.WriteLine("[Suspending]正在保存当前的播放历史记录");
+
+            //StorageFile jsonFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("MusicHistory.json", CreationCollisionOption.ReplaceExisting);
+            //StreamWriter streamWriter = new StreamWriter(await jsonFile.OpenStreamForWriteAsync());
+            //string json = JsonSerializer.Serialize(musicHistoryHelper.MusicHistoryItemsProperty, new JsonSerializerOptions() { WriteIndented = true });
+            //streamWriter.Write(json);
+            //Debug.WriteLine("[Suspending]完成");
 
             Debug.WriteLine("[Suspending]进入挂起态");
             deferral.Complete();

@@ -132,6 +132,7 @@
     </Compile>
     <Compile Include="Helpers\AppInfomation.cs" />
     <Compile Include="Helpers\ImageColors.cs" />
+    <Compile Include="Helpers\MusicHistoryHelper.cs" />
     <Compile Include="Helpers\MusicInfomation.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Helpers\TileHelper.cs" />
@@ -303,6 +304,9 @@
       <Version>6.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
+      <Version>6.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Animations">
       <Version>6.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">

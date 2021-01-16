@@ -18,6 +18,9 @@ namespace Live_Music.Services
     /// </summary>
     public class MusicService : IDisposable
     {
+        /// <summary>
+        /// 当播放器循环播放的状态改变时发生
+        /// </summary>
         public event Action<RepeatingMusicValueChangedEventArgs> RepeatingMusicValueChanged;
         /// <summary>
         /// 音乐播放器的实例
@@ -178,6 +181,9 @@ namespace Live_Music.Services
             }
         }
 
+        /// <summary>
+        /// 播放器循环播放状态的属性
+        /// </summary>
         public bool? IsRepeatingMusic
         {
             get 
@@ -201,8 +207,14 @@ namespace Live_Music.Services
         }
     }
 
+    /// <summary>
+    /// 包含播放器循环播放属性更改的信息
+    /// </summary>
     public class RepeatingMusicValueChangedEventArgs : EventArgs
     {
+        /// <summary>
+        /// 循环播放状态的新值
+        /// </summary>
         public bool? NewValue { get; set; }
     }
 }
