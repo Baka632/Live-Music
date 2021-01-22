@@ -3,7 +3,9 @@ using Live_Music.Views;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
@@ -21,6 +23,7 @@ namespace Live_Music.Helpers
         MusicService musicService = App.musicService;
         MusicInfomation musicInfomation = App.musicInfomation;
         Dictionary<string, MusicHistoryTemplate> musicHistroyItems = new Dictionary<string, MusicHistoryTemplate>();
+
         public event Action<NewItemsAddedToMusicHistoryEventArgs> NewItemsAddedToMusicHistoryEvent;
 
         public MusicHistoryHelper()
@@ -29,11 +32,17 @@ namespace Live_Music.Helpers
             MainPage.PropertiesLoadCompleteEvent += MainPage_PropertiesLoadCompleteEvent;
         }
 
-        //public Dictionary<string, MusicHistoryTemplate> MusicHistoryItemsProperty 
-        //{ 
-        //    get => musicHistroyItems;
-        //    set => musicHistroyItems = value;
-        //}
+        public Dictionary<string, MusicHistoryTemplate> MusicHistoryItemsProperty
+        {
+            get => musicHistroyItems;
+            set
+            {
+                foreach (var item in value)
+                {
+                    musicHistroyItems.Add(item.Key,item.Value);
+                }
+            }
+        }
 
         private void MainPage_PropertiesLoadCompleteEvent()
         {
@@ -57,6 +66,7 @@ namespace Live_Music.Helpers
         }
     }
 
+    [Serializable]
     /// <summary>
     /// 播放内容的种类
     /// </summary>
@@ -76,12 +86,15 @@ namespace Live_Music.Helpers
         Playlist
     }
 
-    public struct MusicHistoryTemplate
+    [Serializable]
+    public class MusicHistoryTemplate : INotifyPropertyChanged
     {
         private string _MusicAlbum;
         private string _MusicAlbumArtist;
         private MusicContentType _ContentType;
+        [NonSerialized]
         private BitmapImage _ContentImage;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// 初始化MusicHistoryTemplate的新实例
@@ -98,28 +111,53 @@ namespace Live_Music.Helpers
             _ContentImage = Image;
         }
 
+        /// <summary>
+        /// 通知系统属性已经发生更改
+        /// </summary>
+        /// <param name="propertyName">发生更改的属性名称,其填充是自动完成的</param>
+        public void OnPropertiesChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public string MusicAlbum
         {
             get => _MusicAlbum;
-            private set => _MusicAlbum = value;
+            private set
+            {
+                _MusicAlbum = value;
+                OnPropertiesChanged();
+            }
         }
 
         public string MusicAlbumArtist
         {
             get => _MusicAlbumArtist;
-            private set => _MusicAlbumArtist = value;
+            private set
+            {
+                _MusicAlbumArtist = value;
+                OnPropertiesChanged();
+            }
         }
 
         public MusicContentType ContentType
         {
             get => _ContentType;
-            private set { _ContentType = value; }
+            private set
+            {
+                _ContentType = value;
+                OnPropertiesChanged();
+            }
         }
 
         public BitmapImage ContentImage
         {
             get => _ContentImage;
-            private set => _ContentImage = value;
+            private set 
+            {
+                _ContentImage = value;
+                OnPropertiesChanged();
+            }
         }
     }
 

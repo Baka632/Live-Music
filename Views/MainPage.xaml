@@ -315,7 +315,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="{x:Bind appInfomation.MusicNowPlayingTimeTextBlockText,Mode=OneWay}" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Slider Margin="5,0,5,0" HorizontalAlignment="Stretch" Grid.Column="1" x:Name="processSlider" Value="{x:Bind musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds,Mode=OneWay}" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
+                <Slider Margin="5,0,5,0" HorizontalAlignment="Stretch" Grid.Column="1" Maximum="{x:Bind musicInfomation.MusicDurationProperties,Mode=OneWay}" x:Name="processSlider" Value="{x:Bind musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds,Mode=OneWay}" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
                 <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" Grid.Column="2" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             
@@ -469,7 +469,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="{x:Bind appInfomation.MusicNowPlayingTimeTextBlockText,Mode=OneWay}" Grid.Column="0" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Slider Margin="5,0,5,0" HorizontalAlignment="Stretch" Grid.Column="1" x:Name="processSliderNarrow" Value="{x:Bind musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds,Mode=OneWay}" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
+                <Slider Margin="5,0,5,0" HorizontalAlignment="Stretch" Grid.Column="1" Maximum="{x:Bind musicInfomation.MusicDurationProperties,Mode=OneWay}" x:Name="processSliderNarrow" Value="{x:Bind musicService.mediaPlayer.PlaybackSession.Position.TotalSeconds,Mode=OneWay}" IsThumbToolTipEnabled="False" ValueChanged="processSlider_ValueChanged"/>
                 <TextBlock Text="{x:Bind musicInfomation.MusicLenthProperties,Mode=OneWay}" Grid.Column="2" FontSize="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
         </Grid>

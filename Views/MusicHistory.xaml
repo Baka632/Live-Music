@@ -21,15 +21,15 @@
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="data:MusicHistoryTemplate">
                     <StackPanel>
-                        <Image Source="{x:Bind ContentImage}" Width="140" Height="140"/>
+                        <Image Source="{x:Bind ContentImage,Mode=OneWay}" Width="140" Height="140"/>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             
-                            <TextBlock FontWeight="Bold" Text="{x:Bind MusicAlbum}" Grid.Row="0"/>
-                            <TextBlock Foreground="Gray" Text="{x:Bind MusicAlbumArtist}" Grid.Row="1"/>
+                            <TextBlock FontWeight="Bold" Text="{x:Bind MusicAlbum,Mode=OneWay}" Grid.Row="0"/>
+                            <TextBlock Foreground="Gray" Text="{x:Bind MusicAlbumArtist,Mode=OneWay}" Grid.Row="1"/>
                         </Grid>
                     </StackPanel>
                 </DataTemplate>
