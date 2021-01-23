@@ -965,6 +965,7 @@ namespace Live_Music
                                         {
                                             Text = musicInfomation.MusicTitleProperties,
                                             HintStyle = AdaptiveTextStyle.Title,
+                                            HintMaxLines = 2,
                                             HintWrap = true,
                                             HintAlign = AdaptiveTextAlign.Left
                                         },
@@ -1014,6 +1015,7 @@ namespace Live_Music
                     {
                         Visual = new TileVisual()
                         {
+                            #region TheSameToBefore
                             TileSmall = new TileBinding()
                             {
                                 Content = new TileBindingContentAdaptive()
@@ -1089,6 +1091,8 @@ namespace Live_Music
                                     }
                                 }
                             },
+                            #endregion
+
                             TileLarge = new TileBinding()
                             {
                                 Content = new TileBindingContentAdaptive()
@@ -1099,7 +1103,7 @@ namespace Live_Music
                                     {
                                         Text = musicInfomation.MusicTitleProperties,
                                         HintStyle = AdaptiveTextStyle.Title,
-                                        HintMaxLines = 3,
+                                        HintMaxLines = 2,
                                         HintWrap = true,
                                         HintAlign = AdaptiveTextAlign.Left
                                     },
