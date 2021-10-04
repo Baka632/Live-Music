@@ -424,9 +424,9 @@ namespace Live_Music
                 await Task.Run(async () =>
                 {
                     string AlbumSaveName = musicInfomation.MusicAlbumProperties.Replace(":", string.Empty).Replace("/", string.Empty).Replace("\\", string.Empty).Replace("?", string.Empty).Replace("*", string.Empty).Replace("|", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
-                    if (!File.Exists($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.jpg"))
+                    if (!File.Exists($"{ApplicationData.Current.TemporaryFolder.Path}\\{AlbumSaveName}.png"))
                     {
-                        StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync($"{AlbumSaveName}.jpg", CreationCollisionOption.OpenIfExists);
+                        StorageFile storageFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync($"{AlbumSaveName}.png", CreationCollisionOption.OpenIfExists);
                         var fileStream = await storageFile.OpenStreamForWriteAsync();
                         await musicThumbnail.GetInputStreamAt(0).AsStreamForRead().CopyToAsync(fileStream);
                         fileStream.Dispose();
@@ -864,7 +864,7 @@ namespace Live_Music
         private async void SetTileSource()
         {
             string album = $"{musicInfomation.MusicAlbumProperties.Replace(":", string.Empty).Replace(" / ", string.Empty).Replace("\\", string.Empty).Replace(" ? ", string.Empty).Replace(" * ", string.Empty).Replace(" | ", string.Empty).Replace("\"", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty)}";
-            string imagePath = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.jpg";
+            string imagePath = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.png";
             if (album == "未知专辑")
             {
                 imagePath = (await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/NullAlbum.png"))).Path;
@@ -951,7 +951,7 @@ namespace Live_Music
                                 },
                                     PeekImage = new TilePeekImage()
                                     {
-                                        Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.jpg"
+                                        Source = $"{ApplicationData.Current.TemporaryFolder.Path}\\{album}.png"
                                     }
                                 }
                             },
