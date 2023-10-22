@@ -2,68 +2,125 @@
     x:Class="Live_Music.Views.CompactPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Live_Music.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Live_Music.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Page_Loaded"
     RequestedTheme="Dark"
-    Loaded="Page_Loaded">
+    mc:Ignorable="d">
     <Page.Resources>
-        <Style TargetType="Button" x:Key="ButtonFontIconStyle" BasedOn="{StaticResource ButtonRevealStyle}">
-            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="CornerRadius" Value="25"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Height" Value="35"/>
-            <Setter Property="Width" Value="35"/>
+        <Style
+            x:Key="ButtonFontIconStyle"
+            BasedOn="{StaticResource ButtonRevealStyle}"
+            TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="25" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="Width" Value="35" />
         </Style>
     </Page.Resources>
 
     <Grid>
-        <StackPanel x:Name="noneMusicStackPanel" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="请播放一些音乐,这里什么都没有。" FontSize="16" FontWeight="SemiBold"/>
+        <StackPanel
+            x:Name="noneMusicStackPanel"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            <TextBlock
+                FontSize="16"
+                FontWeight="SemiBold"
+                Text="请播放一些音乐,这里什么都没有。" />
         </StackPanel>
-        
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="musicInfoGrid">
+
+        <Grid
+            x:Name="musicInfoGrid"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
             <Grid.Background>
                 <AcrylicBrush
                     BackgroundSource="HostBackdrop"
-                    TintColor="Gray"
-                    TintOpacity="0.75"
                     FallbackColor="Gray"
-                />
+                    TintColor="Gray"
+                    TintOpacity="0.75" />
             </Grid.Background>
 
-            <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0.3" Stretch="UniformToFill" Source="{x:Bind musicInfomation.MusicImageProperties,Mode=OneWay}"/>
+            <Image
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Opacity="0.3"
+                Source="{x:Bind musicInfomation.MusicImageProperties, Mode=OneWay}"
+                Stretch="UniformToFill" />
 
-            <Grid x:Name="musicInfomationGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid
+                x:Name="musicInfomationGrid"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
                 <Grid.Background>
-                    <AcrylicBrush TintOpacity="0" TintColor="Gray"/>
+                    <AcrylicBrush TintColor="Gray" TintOpacity="0" />
                 </Grid.Background>
-                
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
-                    <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE100;" Click="PreviousMusic"/>
 
-                    <Button x:Name="musicPlayPauseButton" FontSize="30" Content="&#xE102;" Margin="6,0,6,0" Style="{StaticResource ButtonFontIconStyle}" Height="55" Width="55" Click="musicPlayPauseButton_Click">
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Button
+                        Click="PreviousMusic"
+                        Content="&#xE100;"
+                        Style="{StaticResource ButtonFontIconStyle}" />
+
+                    <Button
+                        x:Name="musicPlayPauseButton"
+                        Width="55"
+                        Height="55"
+                        Margin="6,0,6,0"
+                        Click="musicPlayPauseButton_Click"
+                        Content="&#xE102;"
+                        FontSize="30"
+                        Style="{StaticResource ButtonFontIconStyle}">
                         <Button.KeyboardAccelerators>
-                            <KeyboardAccelerator Modifiers="None" Key="Space"/>
-                            <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                            <KeyboardAccelerator Key="Space" Modifiers="None" />
+                            <KeyboardAccelerator Key="P" Modifiers="Control" />
                         </Button.KeyboardAccelerators>
                     </Button>
 
-                    <Button Style="{StaticResource ButtonFontIconStyle}" Content="&#xE101;" Click="NextMusic"/>
+                    <Button
+                        Click="NextMusic"
+                        Content="&#xE101;"
+                        Style="{StaticResource ButtonFontIconStyle}" />
                 </StackPanel>
 
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,50">
-                    <TextBlock Text="{x:Bind musicInfomation.MusicTitleProperties,Mode=OneWay}" FontWeight="Bold" TextAlignment="Center" Margin="0,0,0,7"/>
-                    <TextBlock Text="{x:Bind musicInfomation.MusicAlbumArtistProperties,Mode=OneWay}" TextAlignment="Center"/>
+                <StackPanel
+                    Margin="0,0,0,50"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom">
+                    <TextBlock
+                        Margin="0,0,0,7"
+                        FontWeight="Bold"
+                        Text="{x:Bind musicInfomation.MusicTitleProperties, Mode=OneWay}"
+                        TextAlignment="Center" />
+                    <TextBlock Text="{x:Bind musicInfomation.MusicAlbumArtistProperties, Mode=OneWay}" TextAlignment="Center" />
                 </StackPanel>
             </Grid>
         </Grid>
-        
-        <Button x:Name="exitButton" Click="ExitCompactPageMode" Content="&#xE158;" FontSize="16" Style="{StaticResource ButtonFontIconStyle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,10"/>
-        <ProgressBar CornerRadius="0" x:Name="progressBar" Maximum="{x:Bind musicInfomation.MusicDurationProperties,Mode=OneWay}" Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
+
+        <Button
+            x:Name="exitButton"
+            Margin="0,0,5,10"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Click="ExitCompactPageMode"
+            Content="&#xE158;"
+            FontSize="16"
+            Style="{StaticResource ButtonFontIconStyle}" />
+        <ProgressBar
+            x:Name="progressBar"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Bottom"
+            CornerRadius="0"
+            Foreground="White"
+            Maximum="{x:Bind musicInfomation.MusicDurationProperties, Mode=OneWay}" />
     </Grid>
 </Page>
